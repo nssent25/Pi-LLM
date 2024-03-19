@@ -2,6 +2,46 @@ import pyaudio
 import wave
 import threading
 
+class AudioRecorder2:
+    def __init__(self):
+        self.CHUNK = 1024  # Number of frames per buffer
+        self.FORMAT = pyaudio.paInt16  # Audio format
+        self.CHANNELS = 2  # Number of channels
+        self.RATE = 44100  # Sampling rate in Hz
+        self.recording = False
+        self.frames = []  # Container for frames (chunks of audio data)
+
+    def start_recording(self):
+        self.p = pyaudio.PyAudio()  # Create a PyAudio session
+        self.stream = self.p.open(format=self.FORMAT,
+                                  channels=self.CHANNELS,
+                                  rate=self.RATE,
+                                  input=True,
+                                  frames_per_buffer=self.CHUNK)
+        self.recording = True
+        self.frames = []
+        print("Recording started.")
+        while self.recording:
+            data = self.stream.read(self.CHUNK)
+            self.frames.append(data)
+
+    def stop_recording(self):
+        self.recording = False
+        self.stream.stop_stream()
+        self.stream.close()
+        self.p.terminate()
+        print("Recording stopped.")
+        self.save_recording()
+
+    def save_recording(self, filename="recording.wav"):
+        wf = wave.open(filename, 'wb')
+        wf.setnchannels(self.CHANNELS)
+        wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
+        wf.setframerate(self.RATE)
+        wf.writeframes(b''.join(self.frames))
+        wf.close()
+        print(f"Recording saved as {filename}.")
+
 class AudioRecorder:
     def __init__(self, sample_rate=48000, chunk=1024, sample_format=pyaudio.paInt16, channels=1):
         self.sample_rate = sample_rate
