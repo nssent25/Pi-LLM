@@ -3,7 +3,7 @@ import wave
 import threading
 
 class AudioRecorder:
-    def __init__(self, sample_rate=44100, chunk=1024, sample_format=pyaudio.paInt16, channels=2):
+    def __init__(self, sample_rate=44100, chunk=1024, sample_format=pyaudio.paInt16, channels=1):
         self.sample_rate = sample_rate
         self.chunk = chunk
         self.sample_format = sample_format
