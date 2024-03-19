@@ -21,6 +21,9 @@ class AudioRecorder2:
         self.recording = True
         self.frames = []
         print("Recording started.")
+        threading.Thread(target=self._record).start()
+
+    def _record(self):
         while self.recording:
             data = self.stream.read(self.CHUNK)
             self.frames.append(data)
