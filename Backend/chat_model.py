@@ -11,6 +11,7 @@ class ChatModel:
     def __init__(self, model_name="gemma:7b", host=None):
         self.model = model_name
         self.host = host # example: "http://localhost:11434"
+        self.message_history = []
         if host:
             self.client = ollama.AsyncClient(host=host, timeout = 60)
         else:
@@ -28,8 +29,9 @@ class ChatModel:
     # message: the message to send to the model
     # to return, use await asyncio.create_task(chat_model.chat(message))
     async def chat(self, message):
-        response = await self.client.chat(model=self.model, messages=[
-            {'role': 'user', 'content': message,},])
+        self.message_history.append({'role': 'user', 'content': message})
+        response = await self.client.chat(model=self.model, messages=self.message_history)
+        self.message_history.append({'role': 'assistant', 'content': response['message']['content']})
         return response
     
     # unused
@@ -38,6 +40,7 @@ class ChatModel:
         async for part in await self.client.chat(model=self.model, messages=[
             {'role': 'user', 'content': messages,},], stream=True):
             print(part['message']['content'], end='', flush=True)
+        print()
     
     # unused
     # Generates text based on a prompt and returns the response as a string
