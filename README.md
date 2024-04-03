@@ -5,8 +5,8 @@ This is the code for a Raspberry Pi-based personal assistant. It uses open sourc
 
 ## What needs to work:
 - [ ] Record audio
-- [ ] Recognize words
+- [x] Recognize words (whisper_speech.py)
 - [ ] Translate words if necessary
-- [x] Chat model
+- [x] Chat model (chat_model.py)
 - [ ] Translate chat model if necessary
 - [ ] Text-to-speech
