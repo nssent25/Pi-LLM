@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 import re
 from gevent.pywsgi import WSGIServer
 from whisper_speech import WhisperSpeech 
@@ -12,6 +12,11 @@ classifier = Classifier(model_name="classify")
 chat_model = ChatModelSync(model_name="gemma:7b")
 image_model = ImageGenerator()
 translator = Translator()
+
+# @app.before_request
+# def limit_remote_addr():
+#     if not request.remote_addr.startswith('137.146'):
+#         abort(403)  # Restrict to Colby IPs
 
 @app.route('/chat', methods=['POST'])
 def chat():
