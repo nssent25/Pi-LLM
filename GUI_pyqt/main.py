@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         self.central_widget.setStyleSheet("background-color: black;")
 
         # Load button images (placeholders for your image paths)
-        self.start_listen_pic = QPixmap('image_processing20191206-10006-1o4c5ii.jpg')
+        self.start_listen_pic = QPixmap('assets/image_processing20191206-10006-1o4c5ii.jpg')
         #self.home_pic = QPixmap('/Users/cliozhu/Desktop/2024-s/CS431/Pi-LLM-main/GUI_wxpython/image_processing20191206-10006-1o4c5ii.jpg')
         icon = QIcon(self.start_listen_pic)
         #icon_home = QIcon(self.home_pic)
@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         self.recording_length_label.hide()
 
         self.recording_animation_label = QLabel(self.central_widget)
-        self.recording_animation = QMovie('Voice assistant motion effect.gif')  # Update path
+        self.recording_animation = QMovie('assets/Voice assistant motion effect.gif')  # Update path
         self.recording_animation_label.setMovie(self.recording_animation)
         self.recording_animation_label.resize(800, 600)  # Adjust size as needed
         self.recording_animation_label.move(145, 276)  # Position it as you like
