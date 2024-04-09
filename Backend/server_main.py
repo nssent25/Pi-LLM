@@ -49,7 +49,8 @@ def chat():
         translation = chat_model.chat(to_translate)
         response_text = chat_model.get_response(translation)
         return jsonify({'input': text, 'response': response_text, 
-                        'task': 'Translation'})
+                        'task': 'Translation',
+                        'language': language})
     
     # default to chat generation
     else:
