@@ -95,3 +95,41 @@ class ChatModelSync:
     # prints the full response from the model
     def print_response(self, response):
         print(self.get_response(response))
+
+
+class Classifier(ChatModelSync):
+    def __init__(self, model_name="gemma:7b", host=None):
+        super().__init__(model_name, host)
+        self.add_initial_messages()
+
+    def add_message(self, message, response):
+        self.message_history.append({'role': 'user', 'content': message})
+        self.message_history.append({'role': 'assistant', 'content': response})
+
+    def add_initial_messages(self):
+        messages = [{'user':'{"Input": "hey"}'},
+                    {"assistant":'{"Text/Chat Generation":"hey"}'},
+                    {'user':'{"Input": "what is the weather like today?"}'},
+                    {"assistant":'{"Text/Chat Generation":"what is the weather like today?"}'},
+                    {'user':'{"Input": "show me a picture of a capybara in a japanese onsen"}'},
+                    {"assistant":'{"Image Generation":"a capybara in a japanese onsen"}'},
+                    {'user':'{"Input": "tell me about the meiji restoration"}'},
+                    {"assistant":'{"Text/Chat Generation":"tell me about the meiji restoration"}'},
+                    {'user':'{"{"Input": "how to say thank you in chinese"}'},
+                    {"assistant":'{"Translation":"Chinese$~$thank you"}'},
+                    {'user':'{"Input": "what is the capital of france?"}'},
+                    {"assistant":'{"Text/Chat Generation":"what is the capital of france?"}'},
+                    {'user':'{"Input": "show me pikachu but pink"}'},
+                    {"assistant":'{"Image Generation":"a pink pikachu"}'},
+                    {'user':'{"Input": "translate hello to spanish"}'},
+                    {"assistant":'{"Translation":"Spanish$~$hello"}'},
+                    {'user':'{"Input": "show me a quesadilla hat"}'},
+                    {"assistant":'{"Image Generation":"a quesadilla shaped like a hat"}'},
+                    {'user':'{"Input": "what is I am sorry I exist in Tamil"}'},
+                    {"assistant":'{"Translation":"Tamil$~$I am sorry I exist"}'}]
+        formatted_messages = []
+        for message in messages:
+            for role, content in message.items():
+                formatted_message = {'role': role, 'content': content}
+                formatted_messages.append(formatted_message)
+        self.message_history = formatted_messages

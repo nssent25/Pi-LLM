@@ -37,6 +37,7 @@ class WhisperSpeech:
                                "language" : lang,
                                "task": "translate"})
         return result["text"]
+    
 # # Usage
 # transcriber = WhisperSpeech()
 # dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
