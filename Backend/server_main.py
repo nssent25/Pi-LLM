@@ -17,7 +17,7 @@ translator = Translator()
 def chat():
     print('Received request')
     auth_key = request.headers.get('Auth-Key')
-    correct_auth_key = "your_correct_auth_key"  # key
+    correct_auth_key = "?Djk8;<jz:.~s*6Bn2dc>Y4TrT<P=E"  # key
 
     if not auth_key or auth_key != correct_auth_key:
         return jsonify({'error': 'Invalid or missing authentication key'}), 403

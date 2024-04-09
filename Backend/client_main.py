@@ -3,7 +3,7 @@ import requests
 # URL of the server
 url = "http://frodo.colby.edu:5000/chat"
 # Correct authentication key
-auth_key = "your_correct_auth_key"
+auth_key = "?Djk8;<jz:.~s*6Bn2dc>Y4TrT<P=E"
 
 directory = "Backend/AudioTests/"
 audio_files = ["joke.m4a", "3body.m4a"]
