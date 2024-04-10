@@ -30,6 +30,12 @@ class AudioServerClient:
             # Print the server's response
             print('User:', response.json()['input'])
             print('Assistant:', response.json()['response'])
+        
+        #save the audio file
+        with open('response.wav', 'wb') as f:
+            f.write(response.content)
+        #return the text
+        return response.json()['response']
 
 # Example usage
 if __name__ == "__main__":
@@ -44,4 +50,3 @@ if __name__ == "__main__":
 
     client = AudioServerClient(url, auth_key, directory)
     client.send_audio(audio_files)
-
