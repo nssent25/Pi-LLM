@@ -58,6 +58,27 @@ class AudioRecorder:
     def close(self):
         self.audio.terminate()
 
+    def play_audio(self, file_path):
+        """
+        Plays an audio file from a given path.
+
+        :param file_path: Path to the audio file to be played.
+        """
+        wf = wave.open(file_path, 'rb')
+        stream = self.audio.open(format=self.audio.get_format_from_width(wf.getsampwidth()),
+                                 channels=wf.getnchannels(),
+                                 rate=wf.getframerate(),
+                                 output=True)
+
+        data = wf.readframes(self.chunk)
+        while data:
+            stream.write(data)
+            data = wf.readframes(self.chunk)
+
+        stream.stop_stream()
+        stream.close()
+        wf.close()
+        print(f"Playback finished for {file_path}.")
 # # Usage example:
 
 # # Create an instance of the AudioRecorder class
