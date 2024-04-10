@@ -1,7 +1,7 @@
 # chat_model.py
 # This program uses the Ollama API to chat with a model and generate text based
 # on a prompt. It includes both asynchronous and synchronous versions of the 
-# chat model, as well as a classifier.
+# chat model, as well as a custom classifier.
 #
 # Nithun Selva, Clio Zhu
 # CS431 Spring 2024

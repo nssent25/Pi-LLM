@@ -1,4 +1,5 @@
 FROM gemma:instruct
+# gemma works better on x86, while mistral works better on ARM
 
 # set the temperature to 1 [higher is more creative, lower is more coherent]
 PARAMETER temperature 0
