@@ -17,10 +17,8 @@ class Translator:
     }
 
     def __init__(self, model_name='nllb-distilled-1.3B'):
-        self.model, self.tokenizer = self.load_model(model_name)
-        model = AutoModelForSeq2SeqLM.from_pretrained(self.models_dict[model_name])
-        tokenizer = AutoTokenizer.from_pretrained(self.models_dict[model_name])
-        return model, tokenizer
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.models_dict[model_name])
+        self.tokenizer = AutoTokenizer.from_pretrained(self.models_dict[model_name])
 
     def translate(self, source_lang, target_lang, text):
         try:

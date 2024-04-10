@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify, abort
 import re
 from gevent.pywsgi import WSGIServer
 from whisper_speech import WhisperSpeech 
-from chat_model import ChatModelSync, Classifier
+from chat_model import ChatModel, Classifier
 from image_gen import ImageGenerator
 from translator import Translator
 
 app = Flask(__name__)
 transcriber = WhisperSpeech()
 classifier = Classifier(model_name="classify")
-chat_model = ChatModelSync(model_name="gemma:7b")
+chat_model = ChatModel(model_name="gemma:7b")
 image_model = ImageGenerator()
 translator = Translator()
 
@@ -37,8 +37,8 @@ def chat():
 
     print('Classifying input')
     classification = classifier.chat(text)
-    print('classification:', classification)
-    json_classification = extract_json(classification)
+    print('classification:', classifier.get_response(classification))
+    json_classification = extract_json(classifier.get_response(classification))
 
     # image generation
     if "Image Generation" in json_classification:
@@ -74,5 +74,6 @@ def extract_json(text):
         return None
     
 if __name__ == '__main__':
+    print('Starting server')
     http_server = WSGIServer(('0.0.0.0', 5000), app)
     http_server.serve_forever()
