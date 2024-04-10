@@ -21,7 +21,7 @@ translator = Translator()
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    print('Received request')
+    print('\nReceived request')
     auth_key = request.headers.get('Auth-Key')
     correct_auth_key = "?Djk8;<jz:.~s*6Bn2dc>Y4TrT<P=E"  # key
 
@@ -61,10 +61,11 @@ def chat():
     elif "Translation" in json_classification:
         print('Translating text')
         language, to_translate = json_classification['Translation'].split('$~$')
-        translation = chat_model.chat(to_translate)
+        translation = translator.translate(src_language, language, to_translate)
         response_text = chat_model.get_response(translation)
         return jsonify({'input': original_text, 'response': response_text, 
                         'task': 'Translation',
+                        'source': src_language,
                         'language': language})
     
     # default to chat generation
