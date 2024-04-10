@@ -28,15 +28,18 @@ class WhisperSpeech:
         )
 
     def transcribe(self, audio_sample):
-        result = self.pipe(audio_sample)
-        return result["text"]
+        result = self.pipe(audio_sample, return_language=True)
+        print(result)
+        return result
 
     def translate(self, audio_sample, lang="english"):
         result = self.pipe(audio_sample, 
                            generate_kwargs={
                                "language" : lang,
-                               "task": "translate"})
-        return result["text"]
+                               "task": "translate"},
+                               return_language=True)
+        print(result)
+        return result
     
 # # Usage
 # transcriber = WhisperSpeech()

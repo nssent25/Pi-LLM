@@ -33,7 +33,14 @@ def chat():
         return jsonify({'error': 'No audio data provided'}), 400
 
     print('Transcribing audio')
-    text = transcriber.transcribe(audio_data)
+    src_text = transcriber.transcribe(audio_data) # transcribe audio
+    src_language = src_text['chunks'][0]['language'] # get language of audio
+    original_text = src_text['text'] # original foreign language text
+    print(src_language)
+    if src_language != 'english': # if not english, translate to english
+        print('Translating audio from', src_language)
+        src_text = transcriber.translate(audio_data)
+    text = src_text['text']
     print('transcribed text:', text)
 
     print('Classifying input')
@@ -47,7 +54,7 @@ def chat():
     if "Image Generation" in json_classification:
         print('Generating image')
         image = image_model.generate(json_classification['Image Generation'])
-        return jsonify({'input': text, 'response': image, 
+        return jsonify({'input': original_text, 'response': image, 
                         'task': 'Image Generation'})
     
     # translation
@@ -56,7 +63,7 @@ def chat():
         language, to_translate = json_classification['Translation'].split('$~$')
         translation = chat_model.chat(to_translate)
         response_text = chat_model.get_response(translation)
-        return jsonify({'input': text, 'response': response_text, 
+        return jsonify({'input': original_text, 'response': response_text, 
                         'task': 'Translation',
                         'language': language})
     
@@ -66,7 +73,14 @@ def chat():
         # response = chat_model.chat(json_classification['Text/Chat Generation'])
         response = chat_model.chat(text)
         response_text = chat_model.get_response(response)
-        return jsonify({'input': text, 'response': response_text,
+
+        if src_language != 'english':
+            print('Translating response back to', src_language)
+            response_text = translator.translate(source_lang='english', 
+                                                 target_lang=src_language, 
+                                                 text=response_text)['result']
+
+        return jsonify({'input': original_text, 'response': response_text,
                         'task': 'Chat'})
 
 def extract_json(text):
