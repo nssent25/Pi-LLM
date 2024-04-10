@@ -142,7 +142,7 @@ class Classifier(ChatModel):
             {"assistant":'{"Image Generation":"a capybara in a japanese onsen"}'},
             {'user':'{"Input": "tell me about the meiji restoration"}'},
             {"assistant":'{"Text/Chat Generation":"tell me about the meiji restoration"}'},
-            {'user':'{"{"Input": "how to say thank you in chinese"}'},
+            {'user':'{"Input": "how to say thank you in chinese"}'},
             {"assistant":'{"Translation":"Chinese$~$thank you"}'},
             {'user':'{"Input": "what is the capital of france?"}'},
             {"assistant":'{"Text/Chat Generation":"what is the capital of france?"}'},

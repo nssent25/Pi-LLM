@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, abort
+import json
 import re
 from gevent.pywsgi import WSGIServer
 from whisper_speech import WhisperSpeech 
@@ -16,7 +17,7 @@ translator = Translator()
 # @app.before_request
 # def limit_remote_addr():
 #     if not request.remote_addr.startswith('137.146'):
-#         abort(403)  # Restrict to Colby IPs
+#         abort(403)  # Restrict to Colby IPs, redundant with port configuration
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -36,9 +37,11 @@ def chat():
     print('transcribed text:', text)
 
     print('Classifying input')
-    classification = classifier.chat(text)
+    to_classify = '{"Input": "' + text + '"}'
+    classification = classifier.chat(to_classify)
     print('classification:', classifier.get_response(classification))
     json_classification = extract_json(classifier.get_response(classification))
+    print('json_classification:', json_classification)
 
     # image generation
     if "Image Generation" in json_classification:
@@ -63,15 +66,16 @@ def chat():
         # response = chat_model.chat(json_classification['Text/Chat Generation'])
         response = chat_model.chat(text)
         response_text = chat_model.get_response(response)
-        return jsonify({'input': text, 'response': response_text})
+        return jsonify({'input': text, 'response': response_text,
+                        'task': 'Chat'})
 
 def extract_json(text):
     match = re.search(r'{.*}', text)
     if match:
         string_json = match.group(0)
-        return jsonify(string_json)
+        return json.loads(string_json)
     else:
-        return None
+        return text
     
 if __name__ == '__main__':
     print('Starting server')
