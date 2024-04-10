@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
         #make an instance of the audio recorder class
         self.audio_recorder = AudioRecorder()
         #make an instance of the client class
-        self.client = AudioServerClient()
+        self.server = AudioServerClient()
         self.setWindowTitle('Hi!')
         self.setGeometry(100, 100, 1080, 1080)
 
@@ -98,9 +98,9 @@ class MainWindow(QMainWindow):
         self.audio_recorder.stop_recording()
         print("Recording stopped, processing...")
         #send the audio file to the server
-        self.client.send_audio(["recording.wav"])
+        text_re = self.server.send_audio(["recording.wav"])
 
-        return "This is the text returned from the processing. Replace with actual processing output."
+        return text_re
 
 
     def on_stop_listen(self):
@@ -141,6 +141,8 @@ class MainWindow(QMainWindow):
         self.back_to_home_btn.show()
         self.textbox.show()
         self.textbox.setText(response)
+        #play the audio
+        self.audio_recorder.play_audio("response.wav")
         self.recording_length_label.hide()
         self.recording_animation.stop()  # Stop the animation
         self.recording_animation_label.hide()  # Hide the animation label
@@ -149,7 +151,7 @@ class MainWindow(QMainWindow):
 
     def update_recording_length(self):
         elapsed_time = self.recording_start_time.elapsed() // 1000
-        self.recording_length_label.setText(f"Recording: {elapsed_time}s")
+        self.recording_length_label.setText(f"Recording Length: {elapsed_time}s")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
