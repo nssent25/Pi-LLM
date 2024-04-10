@@ -6,6 +6,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QIcon
 #import the audio recorder class
 from audio import AudioRecorder
+#import the client class
+from client import AudioServerClient
 
 
 class MainWindow(QMainWindow):
@@ -13,6 +15,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         #make an instance of the audio recorder class
         self.audio_recorder = AudioRecorder()
+        #make an instance of the client class
+        self.client = AudioServerClient()
         self.setWindowTitle('Hi!')
         self.setGeometry(100, 100, 1080, 1080)
 
@@ -93,6 +97,8 @@ class MainWindow(QMainWindow):
     def stop_recording_and_process(self):
         self.audio_recorder.stop_recording()
         print("Recording stopped, processing...")
+        #send the audio file to the server
+        self.client.send_audio(["recording.wav"])
 
         return "This is the text returned from the processing. Replace with actual processing output."
 
@@ -143,7 +149,7 @@ class MainWindow(QMainWindow):
 
     def update_recording_length(self):
         elapsed_time = self.recording_start_time.elapsed() // 1000
-        self.recording_length_label.setText(f"Recording Length: {elapsed_time}s")
+        self.recording_length_label.setText(f"Recording: {elapsed_time}s")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
