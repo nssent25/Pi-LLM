@@ -1,3 +1,4 @@
+import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from flask import jsonify
 import time
@@ -17,7 +18,11 @@ class Translator:
     }
 
     def __init__(self, model_name='nllb-distilled-1.3B'):
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.models_dict[model_name])
+        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(
+            self.models_dict[model_name], torch_dtype=self.torch_dtype)
+        self.model.to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(self.models_dict[model_name])
 
     def translate(self, text, src_lang, tgt_lang):
@@ -31,8 +36,13 @@ class Translator:
             return jsonify({'error': 'Invalid target language ' + tgt_lang}), 400
         
         start_time = time.time()
-        translator = pipeline('translation', model=self.model,
-                              tokenizer=self.tokenizer, src_lang=source, tgt_lang=target)
+        translator = pipeline('translation', 
+                              model=self.model,
+                              torch_dtype=self.torch_dtype,
+                              device=self.device,
+                              tokenizer=self.tokenizer, 
+                              src_lang=source, 
+                              tgt_lang=target)
         output = translator(text, max_length=400)
         end_time = time.time()
 

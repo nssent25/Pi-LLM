@@ -14,7 +14,7 @@ classifier = Classifier(model_name="classify")
 chat_model = ChatModel(model_name="mistral:7b")
 image_model = ImageGenerator()
 translator = Translator()
-speech_transcriber = SpeechTranscriber()
+# speech_transcriber = SpeechTranscriber()
 
 # @app.before_request
 # def limit_remote_addr():
@@ -82,11 +82,9 @@ def chat():
 
         if src_language != 'english':
             print('Translating response back to', src_language)
-            response_text = speech_transcriber.translate(text=response_text,
+            response_text = translator.translate(text=response_text,
                                                  src_lang='english', 
-                                                 tgt_lang=src_language)
-            print(response_text)
-
+                                                 tgt_lang=src_language)['result']
         return jsonify({'input': original_text, 
                         'response': response_text,
                         'task': 'Chat'})
@@ -103,4 +101,3 @@ if __name__ == '__main__':
     http_server = WSGIServer(('0.0.0.0', 5000), app)
     print('Server running...')
     http_server.serve_forever()
-    

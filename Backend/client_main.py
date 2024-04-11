@@ -26,7 +26,4 @@ for audio_file in audio_files:
     # Print the server's response
     print('User:', response.json()['input'])
     print('Assistant:', response.json()['response'])
-
-    if response.headers['task'] == 'Image Generation':
-        with open('response.jpg', 'wb') as f:
-            f.write(response.content)
+    
