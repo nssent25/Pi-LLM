@@ -9,6 +9,8 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from flask import jsonify
 import time
 
+# The Translator class provides functionality for translating text samples
+# using the Meta NLLB (No Language Left Behind) model.
 class Translator:
     models_dict = {
         'nllb-1.3B': 'facebook/nllb-200-1.3B',
