@@ -39,6 +39,7 @@ class Translator:
         'korean': 'kor_Hang',
         'dutch': 'nld_Latn',
         'nepali': 'npi_Deva', # no speech support
+        'portuguese': 'por_Latn',
         'russian': 'rus_Cyrl',
         'swedish': 'swe_Latn',
         'tamil': 'tam_Taml', # no speech support

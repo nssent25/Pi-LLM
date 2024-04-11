@@ -6,7 +6,7 @@ url = "http://frodo.colby.edu:5000/chat"
 auth_key = "?Djk8;<jz:.~s*6Bn2dc>Y4TrT<P=E"
 
 directory = "Backend/AudioTests/"
-audio_files = ["joke.m4a", "3body.m4a", "zh_test.m4a"]
+audio_files = ["joke.m4a", "3body.m4a", "zh_test.m4a"]#, "fr_test.m4a", "ja_test.m4a"]
 
 for audio_file in audio_files:
     audio_file_path = directory + audio_file
@@ -26,4 +26,3 @@ for audio_file in audio_files:
     # Print the server's response
     print('User:', response.json()['input'])
     print('Assistant:', response.json()['response'])
-    
