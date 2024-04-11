@@ -1,3 +1,4 @@
+import torch
 from transformers import AutoProcessor, SeamlessM4Tv2Model
 import torchaudio
 
@@ -34,6 +35,11 @@ class SpeechTranscriber:
     }
 
     def __init__(self, model_name="facebook/seamless-m4t-v2-large"):
+        # Determine the execution device based on CUDA availability
+        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        # Choose the appropriate data type for tensors based on device capabilities
+        self.torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+
         self.processor = AutoProcessor.from_pretrained(model_name)
         self.model = SeamlessM4Tv2Model.from_pretrained(model_name)
 

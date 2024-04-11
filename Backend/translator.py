@@ -9,7 +9,6 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from flask import jsonify
 import time
 
-
 class Translator:
     models_dict = {
         'nllb-1.3B': 'facebook/nllb-200-1.3B',
