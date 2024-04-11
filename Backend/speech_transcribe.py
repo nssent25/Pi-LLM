@@ -25,7 +25,7 @@ class SpeechTranscriber:
         'russian': 'rus',
         'swedish': 'swe',
         'tamil': 'tam', # no speech support
-        # 'telugu': 'tel',
+        # 'telugu': 'tel', # no whisper support
         'tagalog': 'tgl',
         'thai': 'tha',
         'turkish': 'tur',

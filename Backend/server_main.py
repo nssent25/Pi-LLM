@@ -6,7 +6,7 @@ from whisper_speech import WhisperSpeech
 from chat_model import ChatModel, Classifier
 from image_gen import ImageGenerator
 from translator import Translator
-from speech_transcribe import SpeechTranscriber
+# from speech_transcribe import SpeechTranscriber
 
 app = Flask(__name__)
 transcriber = WhisperSpeech()
@@ -34,6 +34,7 @@ def chat():
     if not audio_data:
         return jsonify({'error': 'No audio data provided'}), 400
 
+    # transcribe audio (whisper)
     print('Transcribing audio')
     src_text = transcriber.transcribe(audio_data) # transcribe audio
     src_language = src_text['chunks'][0]['language'] # get language of audio
@@ -44,6 +45,7 @@ def chat():
     text = src_text['text'] 
     print('transcribed text:', text)
 
+    # classify input
     print('Classifying input')
     to_classify = '{"Input": "' + text + '"}' # format text for classification
     classification = classifier.chat(to_classify)
@@ -99,5 +101,5 @@ def extract_json(text):
     
 if __name__ == '__main__':
     http_server = WSGIServer(('0.0.0.0', 5000), app)
-    print('Server running...')
+    print('\nServer running...')
     http_server.serve_forever()
