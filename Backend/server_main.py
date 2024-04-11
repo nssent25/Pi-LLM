@@ -6,13 +6,15 @@ from whisper_speech import WhisperSpeech
 from chat_model import ChatModel, Classifier
 from image_gen import ImageGenerator
 from translator import Translator
+from speech_transcribe import SpeechTranscriber
 
 app = Flask(__name__)
 transcriber = WhisperSpeech()
 classifier = Classifier(model_name="classify")
-chat_model = ChatModel(model_name="gemma:7b")
+chat_model = ChatModel(model_name="mistral:7b")
 image_model = ImageGenerator()
 translator = Translator()
+speech_transcriber = SpeechTranscriber()
 
 # @app.before_request
 # def limit_remote_addr():
@@ -36,15 +38,14 @@ def chat():
     src_text = transcriber.transcribe(audio_data) # transcribe audio
     src_language = src_text['chunks'][0]['language'] # get language of audio
     original_text = src_text['text'] # original foreign language text
-    print(src_language)
     if src_language != 'english': # if not english, translate to english
         print('Translating audio from', src_language)
         src_text = transcriber.translate(audio_data)
-    text = src_text['text']
+    text = src_text['text'] 
     print('transcribed text:', text)
 
     print('Classifying input')
-    to_classify = '{"Input": "' + text + '"}'
+    to_classify = '{"Input": "' + text + '"}' # format text for classification
     classification = classifier.chat(to_classify)
     print('classification:', classifier.get_response(classification))
     json_classification = extract_json(classifier.get_response(classification))
@@ -54,16 +55,20 @@ def chat():
     if "Image Generation" in json_classification:
         print('Generating image')
         image = image_model.generate(json_classification['Image Generation'])
-        return jsonify({'input': original_text, 'response': image, 
+        return jsonify({'input': original_text, 
+                        'response': image, 
                         'task': 'Image Generation'})
     
     # translation
     elif "Translation" in json_classification:
         print('Translating text')
         language, to_translate = json_classification['Translation'].split('$~$')
-        translation = translator.translate(src_language, language, to_translate)
-        response_text = chat_model.get_response(translation)
-        return jsonify({'input': original_text, 'response': response_text, 
+        language = language.strip().lower()
+        print('Translating to', language)
+        translation = translator.translate(to_translate, src_language, language)
+        response_text = translation['result']
+        return jsonify({'input': original_text, 
+                        'response': response_text, 
                         'task': 'Translation',
                         'source': src_language,
                         'language': language})
@@ -77,11 +82,13 @@ def chat():
 
         if src_language != 'english':
             print('Translating response back to', src_language)
-            response_text = translator.translate(source_lang='english', 
-                                                 target_lang=src_language, 
-                                                 text=response_text)['result']
+            response_text = speech_transcriber.translate(text=response_text,
+                                                 src_lang='english', 
+                                                 tgt_lang=src_language)
+            print(response_text)
 
-        return jsonify({'input': original_text, 'response': response_text,
+        return jsonify({'input': original_text, 
+                        'response': response_text,
                         'task': 'Chat'})
 
 def extract_json(text):
@@ -93,6 +100,7 @@ def extract_json(text):
         return text
     
 if __name__ == '__main__':
-    print('Starting server')
     http_server = WSGIServer(('0.0.0.0', 5000), app)
+    print('Server running...')
     http_server.serve_forever()
+    
