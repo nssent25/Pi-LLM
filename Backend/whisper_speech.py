@@ -27,7 +27,7 @@ class WhisperSpeech:
 
         # Load the pre-trained Whisper model and associated processor
         self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id, torch_dtype=self.torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
+            model_id, torch_dtype=self.torch_dtype, use_safetensors=True
         )
         self.model.to(self.device) # Move the model to the execution device
         self.processor = AutoProcessor.from_pretrained(model_id)
@@ -40,7 +40,7 @@ class WhisperSpeech:
             feature_extractor=self.processor.feature_extractor,
             max_new_tokens=256, # Maximum number of new tokens to generate
             chunk_length_s=30, # 30-second chunks
-            batch_size=16, # Process 16 chunks at a time
+            batch_size=1, # Process 1 chunks at a time
             return_timestamps=True,
             torch_dtype=self.torch_dtype,
             device=self.device,

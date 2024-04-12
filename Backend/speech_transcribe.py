@@ -41,7 +41,7 @@ class SpeechTranscriber:
         self.torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
         self.processor = AutoProcessor.from_pretrained(model_name)
-        self.model = SeamlessM4Tv2Model.from_pretrained(model_name)
+        self.model = SeamlessM4Tv2Model.from_pretrained(model_name).to(self.device)
 
     def text_to_speech(self, text, src_lang="english", tgt_lang="english"):
         text_inputs = self.processor(text=text, 
