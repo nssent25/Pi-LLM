@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget
-from PyQt5.QtGui import QPixmap, QIcon, QMovie
-from PyQt5.QtCore import QTimer, QTime
+from PyQt5.QtGui import QPixmap, QIcon, QMovie, QPainter, QPen, QColor
+from PyQt5.QtCore import QTimer, QTime, Qt
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
 
@@ -11,24 +11,42 @@ class MainWindow(QMainWindow):
         # Initialize the main window, audio recorder, and server client
         self.audio_recorder = AudioRecorder()
         self.server = AudioServerClient()
-        self.setWindowTitle('Hi!')
-        self.setGeometry(100, 100, 1080, 1080)
+        self.height = 1080
+        self.width = 1080
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setGeometry(0, 0, self.width, self.height)
 
         # Setup the central widget with a black background
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.central_widget.setStyleSheet("background-color: black;")
+        self.setup_start_listen_button()
+        self.setup_stop_listen_button()
+        self.setup_back_to_home_button()
+        self.setup_textbox()
+        self.setup_recording_length_label()
+        self.setup_recording_animation()
+        self.setup_recording_timer()
 
+    def setup_start_listen_button(self):
         # Setup the start listen button with an image icon
         self.start_listen_pic = QPixmap('assets/image_processing20191206-10006-1o4c5ii.jpg')
-        icon = QIcon(self.start_listen_pic)
+        # Scale the QPixmap
+        scaled_pic = self.start_listen_pic.scaled(self.start_listen_pic.size() * 1.5, 
+                                                  Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        icon = QIcon(scaled_pic)
         self.start_listen_btn = QPushButton('', self.central_widget)
         self.start_listen_btn.setIcon(icon)
-        self.start_listen_btn.setIconSize(self.start_listen_pic.size())
-        self.start_listen_btn.resize(800, 600)
-        self.start_listen_btn.move(145, 276)
+        self.start_listen_btn.setIconSize(scaled_pic.size())
+        self.start_listen_btn.resize(scaled_pic.width(), scaled_pic.height())
+        # Calculate the top-left position to center the button at (540, 540)
+        x = self.width // 2 - self.start_listen_btn.width() // 2
+        y = self.height // 2 - self.start_listen_btn.height() // 2
+        self.start_listen_btn.move(x, y)
+
         self.start_listen_btn.clicked.connect(self.on_start_listen)
 
+    def setup_stop_listen_button(self):
         # Setup the stop listen button
         self.stop_listen_btn = QPushButton('Stop', self.central_widget)
         self.stop_listen_btn.resize(80, 60)
@@ -37,6 +55,7 @@ class MainWindow(QMainWindow):
         self.stop_listen_btn.clicked.connect(self.on_stop_listen)
         self.stop_listen_btn.hide()
 
+    def setup_back_to_home_button(self):
         # Setup the back to home button
         self.back_to_home_btn = QPushButton('Home', self.central_widget)
         self.back_to_home_btn.setStyleSheet("background-color: white;")
@@ -45,6 +64,7 @@ class MainWindow(QMainWindow):
         self.back_to_home_btn.clicked.connect(self.on_back_to_home)
         self.back_to_home_btn.hide()
 
+    def setup_textbox(self):
         # Setup the textbox for displaying processed text
         self.textbox = QTextEdit(self.central_widget)
         self.textbox.resize(671, 509)
@@ -52,12 +72,14 @@ class MainWindow(QMainWindow):
         self.textbox.setStyleSheet("color: white; background-color: black;")
         self.textbox.hide()
 
+    def setup_recording_length_label(self):
         # Setup the recording length label
         self.recording_length_label = QLabel("Recording: 0s", self.central_widget)
         self.recording_length_label.move(145, 50)
         self.recording_length_label.setStyleSheet("color: white;")
         self.recording_length_label.hide()
 
+    def setup_recording_animation(self):
         # Setup recording animation
         self.recording_animation_label = QLabel(self.central_widget)
         self.recording_animation = QMovie('assets/Voice assistant motion effect.gif')
@@ -66,6 +88,7 @@ class MainWindow(QMainWindow):
         self.recording_animation_label.move(145, 276)
         self.recording_animation_label.hide()
 
+    def setup_recording_timer(self):
         # Timer setup for tracking recording length
         self.recording_timer = QTimer(self)
         self.recording_timer.timeout.connect(self.update_recording_length)
