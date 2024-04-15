@@ -1,12 +1,20 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout
-from PyQt5.QtGui import QPixmap, QIcon, QMovie, QPainter, QPen, QColor
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog
+from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor
 from PyQt5.QtCore import QTimer, QTime, Qt
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
-from PIL import Image
 import base64
-from io import BytesIO
+
+class CircleWidget(QWidget): # unused
+    def __init__(self, parent=None):
+        super(CircleWidget, self).__init__(parent)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setPen(QPen(Qt.white, 2))  # Set pen color and width
+        painter.setBrush(Qt.NoBrush)  # No fill
+        painter.drawEllipse(self.width()//2 - 540, self.height()//2 - 540, 1080, 1080)
 
 class HomeView(QWidget):
     def __init__(self, parent=None):
@@ -154,7 +162,7 @@ class ChatView(QWidget):
         self.textbox.resize(671, 509)
         self.textbox.move(187, 200)
         self.textbox.setStyleSheet("color: white; background-color: black;")
-        self.textbox.hide()
+        self.hide()
 
     def hide(self):
         # Hide the chat screen
@@ -164,7 +172,7 @@ class ChatView(QWidget):
         # Show the chat screen
         self.textbox.show()
 
-    def displayText(self, response):
+    def display(self, response):
         # Display the text in the chat screen
         text = 'User: ' + response['input'] + '\nAssistant: ' + response['response'] + '\n'
         self.textbox.setText(text)
@@ -176,19 +184,35 @@ class ImageView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        pass
+        # Create a QLabel to display the image
+        self.image_label = QLabel(self)
+        self.image_label.setGeometry(0, 0, self.parent().width, self.parent().height)
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.image_label)
+        layout.setAlignment(self.image_label, Qt.AlignCenter)
+        self.hide()
+
+    def hide(self):
+        # Hide the image view
+        self.image_label.clear()
+        self.image_label.hide()
+
+    def show(self):
+        # Show the image view
+        self.image_label.show()
 
     def display(self, response):
-        self.showImage(response['image'])
-        pass
+        # Convert the base64 image data to QPixmap and display it
+        image = self.base64_to_image(response['response'])
+        self.image_label.setPixmap(image)
+        self.show()
 
-    def showImage(self, image_data):
-        pass
-
-    def base64_to_image(base64_str):
+    def base64_to_image(self, base64_str):
+        # Convert base64 string to QPixmap
         img_bytes = base64.b64decode(base64_str)
-        img = Image.open(BytesIO(img_bytes))
-        return img
+        image = QImage.fromData(img_bytes)
+        pixmap = QPixmap.fromImage(image)
+        return pixmap
 
 class TranslationView(QWidget):
     def __init__(self, parent=None):
@@ -215,6 +239,14 @@ class TranslationView(QWidget):
 
         # Set the main layout of the widget
         self.setLayout(layout)
+        self.hide()
+
+    def hide(self):
+        # Hide the translation view
+        self.originalTextLabel.hide()
+        self.originalText.hide()
+        self.translatedTextLabel.hide()
+        self.translatedText.hide()
 
     def display(self, response):
         # Method to update the text fields with the translation data
@@ -236,12 +268,23 @@ class MainWindow(QMainWindow):
         # Setup the central widget with a black background
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget)
+        self.central_widget.setLayout(self.layout)
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView = HomeView(self)
+        # layout.addWidget(self.homeView)
         self.recordingView = RecordingView(self)
+        # layout.addWidget(self.recordingView)
+        # self.recordingView.hide()
         self.chatView = ChatView(self)
+        # layout.addWidget(self.chatView)
+        # self.chatView.hide()
         self.imageView = ImageView(self)
+        # layout.addWidget(self.imageView)
+        # self.imageView.hide()
         self.translationView = TranslationView(self)
+        # layout.addWidget(self.translationView)
+        # self.translationView.hide()
 
     def transition_to_record(self):
         # Transition to the recording screen and start recording
@@ -258,28 +301,46 @@ class MainWindow(QMainWindow):
         # Stop recording and process the audio file
         self.audio_recorder.stop_recording()
         print("Recording stopped, processing...")
+
+        # Create a QProgressDialog
+        progress = QProgressDialog("Thinking...", None, 0, 1, self)
+        progress.setWindowModality(Qt.WindowModal)
+        progress.show()
+
+        # Process the audio file
         response = self.server.send_audio("recording.wav")
+
+        # Close the QProgressDialog
+        progress.setValue(1)
+        progress.close()
+
         self.process_response(response)
 
     def transition_to_home(self):
         # Reset UI elements to initial state (home screen)
         self.chatView.hide()
         self.recordingView.hide()
+        self.imageView.hide()
+        self.translationView.hide()
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView.show()
+        while self.layout.count():
+            child = self.layout.takeAt(0)
+            if child.widget():
+                self.layout.removeWidget(child.widget())
         self.update()
 
     def process_response(self, response):
         # Process the response from the server after recording
         response = response.json()
+        self.central_widget.setStyleSheet("background-color: black;")
         if response['task'] == 'Image Generation':
             self.imageView.display(response)
+            self.layout.addWidget(self.imageView)
         elif response['task'] == 'Translation':
             self.translationView.display(response)
         else:
-            self.chatView.displayText(response)
-
-        # self.central_widget.setStyleSheet("background-color: black;")
+            self.chatView.display(response)
         self.update()
 
 
