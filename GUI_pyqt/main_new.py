@@ -28,7 +28,7 @@ class HomeView(QWidget):
         scaled_pic = self.start_listen_pic.scaled(self.start_listen_pic.size() * 2, 
                                                   Qt.KeepAspectRatio, Qt.SmoothTransformation)
         icon = QIcon(scaled_pic)
-        self.start_listen_btn = QPushButton('', self.parent().central_widget)
+        self.start_listen_btn = QPushButton('', self.parent())
         self.start_listen_btn.setIcon(icon)
         self.start_listen_btn.setIconSize(scaled_pic.size())
         self.start_listen_btn.resize(scaled_pic.width(), scaled_pic.height())
@@ -186,7 +186,7 @@ class ImageView(QWidget):
     def setup_ui(self):
         # Create a QLabel to display the image
         self.image_label = QLabel(self)
-        self.image_label.setGeometry(0, 0, int(self.parent().width/1.45), int(self.parent().height/1.45))
+        self.image_label.setGeometry(0, 0, 750, 750)
         layout = QVBoxLayout(self)
         layout.addWidget(self.image_label)
         layout.setAlignment(self.image_label, Qt.AlignCenter)
@@ -212,6 +212,7 @@ class ImageView(QWidget):
         img_bytes = base64.b64decode(base64_str)
         image = QImage.fromData(img_bytes)
         pixmap = QPixmap.fromImage(image)
+        pixmap = pixmap.scaled(750, 750, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         return pixmap
 
 class TranslationView(QWidget):
@@ -285,6 +286,14 @@ class MainWindow(QMainWindow):
         self.imageView = ImageView(self)
         self.translationView = TranslationView(self)
 
+    def hide_widgets(self):
+        # Hide all widgets
+        self.homeView.hide()
+        self.recordingView.hide()
+        self.chatView.hide()
+        self.imageView.hide()
+        self.translationView.hide()
+
     def transition_to_record(self):
         # Transition to the recording screen and start recording
         self.start_recording()
@@ -338,11 +347,12 @@ class MainWindow(QMainWindow):
             self.layout.removeWidget(self.currentWidget)
             self.currentWidget.hide()
             self.currentWidget = None
-        # self.chatView.hide()
-        # self.recordingView.hide()
-        # self.imageView.hide()
-        # self.translationView.hide()
+        self.chatView.hide()
+        self.recordingView.hide()
+        self.imageView.hide()
+        self.translationView.hide()
         self.central_widget.setStyleSheet("background-color: black;")
+        self.homeView.raise_()
         self.homeView.show()
         self.update()
 
