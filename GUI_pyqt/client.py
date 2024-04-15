@@ -44,6 +44,7 @@ class AudioServerClient:
         else:
             print('User:', json_response['input'])
             print('Assistant:', json_response['response'])
+        return response
 
 # Example usage
 if __name__ == "__main__":

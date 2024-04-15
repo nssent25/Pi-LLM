@@ -321,28 +321,30 @@ class MainWindow(QMainWindow):
         self.central_widget.setStyleSheet("background-color: black;")
         if response['task'] == 'Image Generation':
             self.imageView.display(response)
-            self.layout.addWidget(self.imageView)
             self.currentWidget = self.imageView
+            self.layout.addWidget(self.currentWidget)
         elif response['task'] == 'Translation':
             self.translationView.display(response)
-            self.layout.addWidget(self.translationView)
             self.currentWidget = self.translationView
+            self.layout.addWidget(self.currentWidget)
         else:
             self.chatView.display(response)
         self.update()
 
     def transition_to_home(self):
         # Reset UI elements to initial state (home screen)
-        self.chatView.hide()
-        self.recordingView.hide()
-        self.imageView.hide()
-        self.translationView.hide()
+        if self.currentWidget:
+            print('removing widget')
+            self.layout.removeWidget(self.currentWidget)
+            self.currentWidget.hide()
+            self.currentWidget = None
+        # self.chatView.hide()
+        # self.recordingView.hide()
+        # self.imageView.hide()
+        # self.translationView.hide()
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView.show()
-        if self.currentWidget:
-            self.layout.removeWidget(self.currentWidget)
         self.update()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
