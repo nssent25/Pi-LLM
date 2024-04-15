@@ -1,9 +1,12 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QPainter, QPen, QColor
 from PyQt5.QtCore import QTimer, QTime, Qt
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
+from PIL import Image
+import base64
+from io import BytesIO
 
 class HomeView(QWidget):
     def __init__(self, parent=None):
@@ -31,9 +34,15 @@ class HomeView(QWidget):
     def on_start_listen(self):
         # Transition to the recording UI and start recording
         self.hide()
-        self.start_listen_btn.hide()
         self.parent().transition_to_record()
 
+    def hide(self):
+        # Hide the home screen
+        self.start_listen_btn.hide()
+
+    def show(self):
+        # Show the home screen
+        self.start_listen_btn.show()
 
 class RecordingView(QWidget):
     def __init__(self, parent=None):
@@ -113,7 +122,25 @@ class RecordingView(QWidget):
     def on_back_to_home(self):
         # Transition back to the home screen
         self.hide()
-        self.transition_to_home()
+        self.parent().transition_to_home()
+
+    def hide(self):
+        # Hide the recording screen and stop the timer
+        self.recording_timer.stop()
+        self.recording_length_label.hide()
+        self.stop_listen_btn.hide()
+        self.back_to_home_btn.hide()
+        self.recording_animation.stop()
+        self.recording_animation_label.hide()
+
+    def show(self):
+        # Show the recording screen and start the timer
+        self.recording_timer.start()
+        self.recording_length_label.show()
+        self.stop_listen_btn.show()
+        self.back_to_home_btn.show()
+        self.recording_animation.start()
+        self.recording_animation_label.show()
 
 
 class ChatView(QWidget):
@@ -122,7 +149,26 @@ class ChatView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        pass
+        # Setup the textbox for displaying processed text
+        self.textbox = QTextEdit(self.parent())
+        self.textbox.resize(671, 509)
+        self.textbox.move(187, 200)
+        self.textbox.setStyleSheet("color: white; background-color: black;")
+        self.textbox.hide()
+
+    def hide(self):
+        # Hide the chat screen
+        self.textbox.hide()
+
+    def show(self):
+        # Show the chat screen
+        self.textbox.show()
+
+    def displayText(self, response):
+        # Display the text in the chat screen
+        text = 'User: ' + response['input'] + '\nAssistant: ' + response['response'] + '\n'
+        self.textbox.setText(text)
+        self.show()
 
 class ImageView(QWidget):
     def __init__(self, parent=None):
@@ -132,13 +178,49 @@ class ImageView(QWidget):
     def setup_ui(self):
         pass
 
+    def display(self, response):
+        self.showImage(response['image'])
+        pass
+
+    def showImage(self, image_data):
+        pass
+
+    def base64_to_image(base64_str):
+        img_bytes = base64.b64decode(base64_str)
+        img = Image.open(BytesIO(img_bytes))
+        return img
+
 class TranslationView(QWidget):
     def __init__(self, parent=None):
         super(TranslationView, self).__init__(parent)
         self.setup_ui()
 
     def setup_ui(self):
-        pass
+        # Create a vertical layout to stack the widgets
+        layout = QVBoxLayout(self)
+        
+        # Label and text edit for original text
+        self.originalTextLabel = QLabel("Original Text:", self)
+        layout.addWidget(self.originalTextLabel)
+        self.originalText = QTextEdit(self)
+        self.originalText.setReadOnly(True)
+        layout.addWidget(self.originalText)
+
+        # Label and text edit for translated text
+        self.translatedTextLabel = QLabel("Translated Text:", self)
+        layout.addWidget(self.translatedTextLabel)
+        self.translatedText = QTextEdit(self)
+        self.translatedText.setReadOnly(True)
+        layout.addWidget(self.translatedText)
+
+        # Set the main layout of the widget
+        self.setLayout(layout)
+
+    def display(self, response):
+        # Method to update the text fields with the translation data
+        self.originalText.setText(response['input'])
+        self.translatedText.setText(response['response'])
+        self.show()  # Ensure the widget is visible when updated
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -157,15 +239,9 @@ class MainWindow(QMainWindow):
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView = HomeView(self)
         self.recordingView = RecordingView(self)
-        self.setup_textbox()
-
-    def setup_textbox(self):
-        # Setup the textbox for displaying processed text
-        self.textbox = QTextEdit(self.central_widget)
-        self.textbox.resize(671, 509)
-        self.textbox.move(187, 200)
-        self.textbox.setStyleSheet("color: white; background-color: black;")
-        self.textbox.hide()
+        self.chatView = ChatView(self)
+        self.imageView = ImageView(self)
+        self.translationView = TranslationView(self)
 
     def transition_to_record(self):
         # Transition to the recording screen and start recording
@@ -185,31 +261,25 @@ class MainWindow(QMainWindow):
         response = self.server.send_audio("recording.wav")
         self.process_response(response)
 
-
     def transition_to_home(self):
         # Reset UI elements to initial state (home screen)
-        self.recording_timer.stop()
-        self.stop_listen_btn.hide()
-        self.textbox.hide()
-        self.recording_length_label.hide()
-        self.back_to_home_btn.hide()
-        self.start_listen_btn.show()
+        self.chatView.hide()
+        self.recordingView.hide()
         self.central_widget.setStyleSheet("background-color: black;")
+        self.homeView.show()
         self.update()
-
-
 
     def process_response(self, response):
         # Process the response from the server after recording
-        text_response = 'User: ' + response.json()['input'] + '\nAssistant: ' + response.json()['response'] + '\n'
-        print(text_response)
-        self.transition_to_display_text(text_response)
+        response = response.json()
+        if response['task'] == 'Image Generation':
+            self.imageView.display(response)
+        elif response['task'] == 'Translation':
+            self.translationView.display(response)
+        else:
+            self.chatView.displayText(response)
 
-    def transition_to_display_text(self, response):
-        # Display the server response text and update UI
-        self.textbox.show()
-        self.textbox.setText(response)
-        self.central_widget.setStyleSheet("background-color: black;")
+        # self.central_widget.setStyleSheet("background-color: black;")
         self.update()
 
 
