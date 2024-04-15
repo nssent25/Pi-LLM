@@ -30,7 +30,8 @@ class MainWindow(QMainWindow):
 
     def setup_start_listen_button(self):
         # Setup the start listen button with an image icon
-        self.start_listen_pic = QPixmap('assets/image_processing20191206-10006-1o4c5ii.jpg')
+        self.start_listen_pic = QPixmap('assets/recordButton.jpg')
+        print(self.start_listen_pic.isNull())
         # Scale the QPixmap
         scaled_pic = self.start_listen_pic.scaled(self.start_listen_pic.size() * 1.5, 
                                                   Qt.KeepAspectRatio, Qt.SmoothTransformation)
