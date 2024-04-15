@@ -186,7 +186,7 @@ class ImageView(QWidget):
     def setup_ui(self):
         # Create a QLabel to display the image
         self.image_label = QLabel(self)
-        self.image_label.setGeometry(0, 0, self.parent().width, self.parent().height)
+        self.image_label.setGeometry(0, 0, int(self.parent().width/1.45), int(self.parent().height/1.45))
         layout = QVBoxLayout(self)
         layout.addWidget(self.image_label)
         layout.setAlignment(self.image_label, Qt.AlignCenter)
@@ -248,6 +248,13 @@ class TranslationView(QWidget):
         self.translatedTextLabel.hide()
         self.translatedText.hide()
 
+    def show(self):
+        # Show the translation view
+        self.originalTextLabel.show()
+        self.originalText.show()
+        self.translatedTextLabel.show()
+        self.translatedText.show()
+
     def display(self, response):
         # Method to update the text fields with the translation data
         self.originalText.setText(response['input'])
@@ -271,20 +278,12 @@ class MainWindow(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
         self.central_widget.setLayout(self.layout)
         self.central_widget.setStyleSheet("background-color: black;")
+        self.currentWidget = None
         self.homeView = HomeView(self)
-        # layout.addWidget(self.homeView)
         self.recordingView = RecordingView(self)
-        # layout.addWidget(self.recordingView)
-        # self.recordingView.hide()
         self.chatView = ChatView(self)
-        # layout.addWidget(self.chatView)
-        # self.chatView.hide()
         self.imageView = ImageView(self)
-        # layout.addWidget(self.imageView)
-        # self.imageView.hide()
         self.translationView = TranslationView(self)
-        # layout.addWidget(self.translationView)
-        # self.translationView.hide()
 
     def transition_to_record(self):
         # Transition to the recording screen and start recording
@@ -316,6 +315,22 @@ class MainWindow(QMainWindow):
 
         self.process_response(response)
 
+    def process_response(self, response):
+        # Process the response from the server after recording
+        response = response.json()
+        self.central_widget.setStyleSheet("background-color: black;")
+        if response['task'] == 'Image Generation':
+            self.imageView.display(response)
+            self.layout.addWidget(self.imageView)
+            self.currentWidget = self.imageView
+        elif response['task'] == 'Translation':
+            self.translationView.display(response)
+            self.layout.addWidget(self.translationView)
+            self.currentWidget = self.translationView
+        else:
+            self.chatView.display(response)
+        self.update()
+
     def transition_to_home(self):
         # Reset UI elements to initial state (home screen)
         self.chatView.hide()
@@ -324,23 +339,8 @@ class MainWindow(QMainWindow):
         self.translationView.hide()
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView.show()
-        while self.layout.count():
-            child = self.layout.takeAt(0)
-            if child.widget():
-                self.layout.removeWidget(child.widget())
-        self.update()
-
-    def process_response(self, response):
-        # Process the response from the server after recording
-        response = response.json()
-        self.central_widget.setStyleSheet("background-color: black;")
-        if response['task'] == 'Image Generation':
-            self.imageView.display(response)
-            self.layout.addWidget(self.imageView)
-        elif response['task'] == 'Translation':
-            self.translationView.display(response)
-        else:
-            self.chatView.display(response)
+        if self.currentWidget:
+            self.layout.removeWidget(self.currentWidget)
         self.update()
 
 

@@ -30,9 +30,20 @@ class AudioServerClient:
             timeout=60)
             # # Print the server's response
         #print(json.dumps(response, indent=4)) 
-        print('User:', response.json()['input'])
-        print('Assistant:', response.json()['response'])
-        return response
+        json_response = response.json()
+        if json_response['task'] == 'Translation':
+            print('User:', json_response['input'])
+            print('Assistant:', json_response['response'])
+            print('Source Language:', json_response['source'])
+            print('Target Language:', json_response['language'])
+
+        elif json_response['task'] == 'Image Generation':
+            print('User:', json_response['input'])
+            print('Task:', json_response['task'])
+
+        else:
+            print('User:', json_response['input'])
+            print('Assistant:', json_response['response'])
 
 # Example usage
 if __name__ == "__main__":
