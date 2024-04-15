@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog
-from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor
+from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
 from PyQt5.QtCore import QTimer, QTime, Qt
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
@@ -36,7 +36,8 @@ class HomeView(QWidget):
         x = self.parent().width // 2 - self.start_listen_btn.width() // 2
         y = self.parent().height // 2 - self.start_listen_btn.height() // 2
         self.start_listen_btn.move(x, y)
-
+        # Make the button colorless
+        self.start_listen_btn.setStyleSheet("background-color: transparent; border: none;")
         self.start_listen_btn.clicked.connect(self.on_start_listen)
 
     def on_start_listen(self):
@@ -150,7 +151,6 @@ class RecordingView(QWidget):
         self.recording_animation.start()
         self.recording_animation_label.show()
 
-
 class ChatView(QWidget):
     def __init__(self, parent=None):
         super(ChatView, self).__init__(parent)
@@ -178,6 +178,20 @@ class ChatView(QWidget):
         self.textbox.setText(text)
         self.show()
 
+class RoundedImageLabel(QLabel):
+    def __init__(self, radius, parent=None):
+        super(RoundedImageLabel, self).__init__(parent)
+        self.radius = radius
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        path = QPainterPath()
+        path.addRoundedRect(0, 0, self.width(), self.height(), self.radius, self.radius)
+        painter.setClipPath(path)
+        if self.pixmap():
+            painter.drawPixmap(self.rect(), self.pixmap())
+
 class ImageView(QWidget):
     def __init__(self, parent=None):
         super(ImageView, self).__init__(parent)
@@ -185,26 +199,38 @@ class ImageView(QWidget):
 
     def setup_ui(self):
         # Create a QLabel to display the image
-        self.image_label = QLabel(self)
+        self.image_label = RoundedImageLabel(75)
         self.image_label.setGeometry(0, 0, 750, 750)
         layout = QVBoxLayout(self)
+        # Create a QLabel to display the input prompt
+        self.input_prompt_label = QLabel(self)
+        font = QFont('Helvetica', 20)
+        self.input_prompt_label.setFont(font)
+        self.input_prompt_label.setStyleSheet("color: white;")
+        # Add the widgets to the layout
+        layout.addWidget(self.input_prompt_label)
+        layout.setAlignment(self.input_prompt_label, Qt.AlignTop | Qt.AlignHCenter)
         layout.addWidget(self.image_label)
-        layout.setAlignment(self.image_label, Qt.AlignCenter)
+        layout.setAlignment(self.image_label, Qt.AlignVCenter | Qt.AlignHCenter)
+
         self.hide()
 
     def hide(self):
         # Hide the image view
         self.image_label.clear()
         self.image_label.hide()
+        self.input_prompt_label.hide()
 
     def show(self):
         # Show the image view
         self.image_label.show()
+        self.input_prompt_label.show()
 
     def display(self, response):
         # Convert the base64 image data to QPixmap and display it
         image = self.base64_to_image(response['response'])
         self.image_label.setPixmap(image)
+        self.input_prompt_label.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
         self.show()
 
     def base64_to_image(self, base64_str):
@@ -296,11 +322,7 @@ class MainWindow(QMainWindow):
 
     def transition_to_record(self):
         # Transition to the recording screen and start recording
-        self.start_recording()
         self.central_widget.setStyleSheet("background-color: #0e0f20;")
-
-    def start_recording(self):
-        # Start audio recording
         self.audio_recorder.start_recording()
         self.recordingView.record()
         print("Recording started...")
