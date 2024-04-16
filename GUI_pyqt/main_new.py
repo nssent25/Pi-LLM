@@ -244,12 +244,17 @@ class ImageView(QWidget):
 
     def display(self, response):
         # Convert the base64 image data to QPixmap and display it
-        image = self.base64_to_image(response)
+        image = self.base64_to_image(response['response'])
+        #save the image to a file
+        #get current time in milliseconds
+        time = QDateTime.currentMSecsSinceEpoch()
+        filenname = response['input'] + 'time'+'.jpg'
+        image.save(filenname)
         self.image_label.setPixmap(image)
         self.input_prompt_label.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
         self.show()
 
-    def base64_to_image(self, response):
+    def base64_to_image(self, base64_str):
         # Convert base64 string to QPixmap
         img_bytes = base64.b64decode(response['response'])
         image = QImage.fromData(img_bytes)
