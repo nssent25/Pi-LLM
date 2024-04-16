@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
-from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime
+from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, QPropertyAnimation, QRect, QEasingCurve
 #import time # Import the time module
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
@@ -228,8 +228,20 @@ class ImageView(QWidget):
         layout.addWidget(self.image_label)
         layout.setAlignment(self.image_label, Qt.AlignVCenter | Qt.AlignHCenter)
         layout.addItem(spacer_bottom)
-
+        self.animation = QPropertyAnimation(self, b"geometry")
         self.hide()
+
+    def animateOut(self):
+        # Animate the widget moving to the bottom of the screen
+        screen_geometry = QApplication.desktop().availableGeometry()
+        end_geometry = QRect(self.geometry().left(), screen_geometry.bottom(), self.geometry().width(), self.geometry().height())
+
+        self.animation.setStartValue(self.geometry())
+        self.animation.setEndValue(end_geometry)
+        self.animation.setDuration(500)
+        self.animation.setEasingCurve(QEasingCurve.OutCubic)
+        self.animation.start()
+        self.animation.finished.connect(self.hide)
 
     def hide(self):
         # Hide the image view
@@ -241,21 +253,34 @@ class ImageView(QWidget):
         # Show the image view
         self.image_label.show()
         self.input_prompt_label.show()
+        # Animate the widget moving from the bottom of the screen
+        screen_geometry = QApplication.desktop().availableGeometry()
+        start_geometry = QRect(self.geometry().left(), screen_geometry.bottom(), self.geometry().width(), self.geometry().height())
+        end_geometry = self.geometry()
+
+        self.animation.setStartValue(start_geometry)
+        self.animation.setEndValue(end_geometry)
+        self.animation.setDuration(500)  # Duration in milliseconds
+        self.animation.setEasingCurve(QEasingCurve.OutCubic)
+        self.animation.start()
 
     def display(self, response):
         # Convert the base64 image data to QPixmap and display it
-        image = self.base64_to_image(response)
+        image = self.base64_to_image(response['response'])
+        #save the image to a file
+        #get current time in milliseconds
+        time = QDateTime.currentMSecsSinceEpoch()
+        filenname = response['input'] + str(time) +'.jpg'
+        image.save(filenname)
         self.image_label.setPixmap(image)
         self.input_prompt_label.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
         self.show()
 
-    def base64_to_image(self, response):
+    def base64_to_image(self, base64_str):
         # Convert base64 string to QPixmap
-        img_bytes = base64.b64decode(response['response'])
+        img_bytes = base64.b64decode(base64_str)
         image = QImage.fromData(img_bytes)
         pixmap = QPixmap.fromImage(image)
-        filename = response['input'] + str(QDateTime.currentMSecsSinceEpoch()) + '.jpg'
-        pixmap.save(filename)
         pixmap = pixmap.scaled(self.image_size, self.image_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         return pixmap
 
