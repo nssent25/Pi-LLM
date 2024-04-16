@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
 from PyQt5.QtCore import QTimer, QTime, Qt
 from audio import AudioRecorder  # Import the AudioRecorder class
@@ -199,19 +199,30 @@ class ImageView(QWidget):
 
     def setup_ui(self):
         # Create a QLabel to display the image
-        self.image_label = RoundedImageLabel(75)
-        self.image_label.setGeometry(0, 0, 750, 750)
+        self.image_size = 700
+        self.image_label = RoundedImageLabel(self.image_size // 10)
+        self.image_label.setGeometry(0, 0, self.image_size, self.image_size)
+
+        # Create a QVBoxLayout
         layout = QVBoxLayout(self)
+
         # Create a QLabel to display the input prompt
         self.input_prompt_label = QLabel(self)
         font = QFont('Helvetica', 20)
         self.input_prompt_label.setFont(font)
         self.input_prompt_label.setStyleSheet("color: white;")
-        # Add the widgets to the layout
+
+        # Create spacer items
+        spacer_top = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        spacer_bottom = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
+
+        # Add the widgets and spacers to the layout
+        layout.addItem(spacer_top)
         layout.addWidget(self.input_prompt_label)
         layout.setAlignment(self.input_prompt_label, Qt.AlignTop | Qt.AlignHCenter)
         layout.addWidget(self.image_label)
         layout.setAlignment(self.image_label, Qt.AlignVCenter | Qt.AlignHCenter)
+        layout.addItem(spacer_bottom)
 
         self.hide()
 
@@ -238,7 +249,7 @@ class ImageView(QWidget):
         img_bytes = base64.b64decode(base64_str)
         image = QImage.fromData(img_bytes)
         pixmap = QPixmap.fromImage(image)
-        pixmap = pixmap.scaled(750, 750, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap = pixmap.scaled(self.image_size, self.image_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         return pixmap
 
 class TranslationView(QWidget):
@@ -247,9 +258,36 @@ class TranslationView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
+        # Set the style of the widget to look like a rounded rectangle card
+        self.setStyleSheet("""
+            QWidget {
+                border: 1px solid #000;
+                border-radius: 10px;
+                padding: 10px;
+                background-color: gray;
+                color: white;
+            }
+            QTextEdit {
+                background-color: gray;
+                color: white;
+            }
+        """)
+
         # Create a vertical layout to stack the widgets
         layout = QVBoxLayout(self)
-        
+
+        # Label and text edit for source language
+        self.sourceLangLabel = QLabel("Source Language:", self)
+        layout.addWidget(self.sourceLangLabel)
+        self.sourceLangText = QLabel(self)
+        layout.addWidget(self.sourceLangText)
+
+        # Label and text edit for destination language
+        self.destLangLabel = QLabel("Destination Language:", self)
+        layout.addWidget(self.destLangLabel)
+        self.destLangText = QLabel(self)
+        layout.addWidget(self.destLangText)
+
         # Label and text edit for original text
         self.originalTextLabel = QLabel("Original Text:", self)
         layout.addWidget(self.originalTextLabel)
@@ -270,6 +308,10 @@ class TranslationView(QWidget):
 
     def hide(self):
         # Hide the translation view
+        self.sourceLangLabel.hide()
+        self.sourceLangText.hide()
+        self.destLangLabel.hide()
+        self.destLangText.hide()
         self.originalTextLabel.hide()
         self.originalText.hide()
         self.translatedTextLabel.hide()
@@ -277,6 +319,10 @@ class TranslationView(QWidget):
 
     def show(self):
         # Show the translation view
+        self.sourceLangLabel.show()
+        self.sourceLangText.show()
+        self.destLangLabel.show()
+        self.destLangText.show()
         self.originalTextLabel.show()
         self.originalText.show()
         self.translatedTextLabel.show()
@@ -284,6 +330,8 @@ class TranslationView(QWidget):
 
     def display(self, response):
         # Method to update the text fields with the translation data
+        self.sourceLangText.setText(response['source'])
+        self.destLangText.setText(response['language'])
         self.originalText.setText(response['input'])
         self.translatedText.setText(response['response'])
         self.show()  # Ensure the widget is visible when updated
@@ -365,14 +413,10 @@ class MainWindow(QMainWindow):
     def transition_to_home(self):
         # Reset UI elements to initial state (home screen)
         if self.currentWidget:
-            print('removing widget')
+            print('removing current widget')
             self.layout.removeWidget(self.currentWidget)
-            self.currentWidget.hide()
             self.currentWidget = None
-        self.chatView.hide()
-        self.recordingView.hide()
-        self.imageView.hide()
-        self.translationView.hide()
+        self.hide_widgets()
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView.raise_()
         self.homeView.show()
