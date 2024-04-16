@@ -1,9 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
-from PyQt5.QtCore import QTimer, QTime, Qt
+from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime
 #import time # Import the time module
-from PyQt5.QtCore import QDateTime
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
 import base64
@@ -249,7 +248,7 @@ class ImageView(QWidget):
         #save the image to a file
         #get current time in milliseconds
         time = QDateTime.currentMSecsSinceEpoch()
-        filenname = response['input'] + 'time'+'.jpg'
+        filenname = response['input'] + str(time) +'.jpg'
         image.save(filenname)
         self.image_label.setPixmap(image)
         self.input_prompt_label.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
