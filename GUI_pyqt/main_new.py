@@ -2,6 +2,8 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
 from PyQt5.QtCore import QTimer, QTime, Qt
+#import time # Import the time module
+from PyQt5.QtCore import QDateTime
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
 import base64
@@ -155,6 +157,7 @@ class ChatView(QWidget):
     def __init__(self, parent=None):
         super(ChatView, self).__init__(parent)
         self.setup_ui()
+        self.conversation = []
 
     def setup_ui(self):
         # Setup the textbox for displaying processed text
@@ -175,7 +178,10 @@ class ChatView(QWidget):
     def display(self, response):
         # Display the text in the chat screen
         text = 'User: ' + response['input'] + '\nAssistant: ' + response['response'] + '\n'
-        self.textbox.setText(text)
+        self.conversation.append(text)
+        screen = '\n'.join(self.conversation)
+        #self.textbox.setText(text)
+        self.textbox.setText(screen)
         self.show()
 
 class RoundedImageLabel(QLabel):
@@ -240,6 +246,11 @@ class ImageView(QWidget):
     def display(self, response):
         # Convert the base64 image data to QPixmap and display it
         image = self.base64_to_image(response['response'])
+        #save the image to a file
+        #get current time in milliseconds
+        time = QDateTime.currentMSecsSinceEpoch()
+        filenname = response['input'] + 'time'+'.jpg'
+        image.save(filenname)
         self.image_label.setPixmap(image)
         self.input_prompt_label.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
         self.show()
