@@ -254,7 +254,7 @@ class ImageView(QWidget):
         img_bytes = base64.b64decode(response['response'])
         image = QImage.fromData(img_bytes)
         pixmap = QPixmap.fromImage(image)
-        filename = response['input'] + str(QDateTime.currentMSecsSinceEpoch()) + '.jpg'
+        filename = 'saved/'+response['input'] + str(QDateTime.currentMSecsSinceEpoch()) + '.jpg'
         pixmap.save(filename)
         pixmap = pixmap.scaled(self.image_size, self.image_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         return pixmap
