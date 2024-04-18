@@ -396,3 +396,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Default temp output
+recording.wav
+GUI_pyqt/recording.wav
+
+# Image cache
+GUI_pyqt/saved/
