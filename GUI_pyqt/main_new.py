@@ -351,7 +351,7 @@ class MainWindow(QMainWindow):
         self.server = AudioServerClient() 
         self.height = 1080
         self.width = 1080
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint) # no title bar
         self.setGeometry(0, 0, self.width, self.height)
 
         # Setup the central widget with a black background
@@ -361,6 +361,8 @@ class MainWindow(QMainWindow):
         self.central_widget.setLayout(self.layout)
         self.central_widget.setStyleSheet("background-color: black;")
         self.currentWidget = None
+
+        # instantiate the different views
         self.homeView = HomeView(self)
         self.recordingView = RecordingView(self)
         self.chatView = ChatView(self)
@@ -391,6 +393,7 @@ class MainWindow(QMainWindow):
         progress = QProgressDialog("Thinking...", None, 0, 1, self)
         progress.setWindowModality(Qt.WindowModal)
         progress.show()
+        QApplication.processEvents()
 
         # Process the audio file
         response = self.server.send_audio("recording.wav")
