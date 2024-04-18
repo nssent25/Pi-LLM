@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
-from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime
+from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, pyqtProperty, QPropertyAnimation, QRectF
 #import time # Import the time module
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
@@ -60,28 +60,12 @@ class RecordingView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setup_recording_length_label()
         self.setup_recording_animation()
-        self.setup_recording_timer()
-        self.setup_stop_listen_button()
-        self.setup_back_to_home_button()
         self.hide()
         
     def record(self):
-        self.stop_listen_btn.show()
-        self.back_to_home_btn.show()
-        self.recording_length_label.show()
-        self.recording_start_time.start()
-        self.recording_timer.start(1000)
         self.recording_animation_label.show()
         self.recording_animation.start()
-
-    def setup_recording_length_label(self):
-        # Setup the recording length label
-        self.recording_length_label = QLabel("Recording: 0s", self.parent())
-        self.recording_length_label.move(145, 50)
-        self.recording_length_label.setStyleSheet("color: white;")
-        self.recording_length_label.hide()
 
     def setup_recording_animation(self):
         # Setup recording animation
@@ -91,64 +75,20 @@ class RecordingView(QWidget):
         self.recording_animation_label.resize(800, 600)
         self.recording_animation_label.move(145, 276)
         self.recording_animation_label.hide()
+        self.recording_animation_label.mousePressEvent = self.on_stop_listen
 
-    def setup_recording_timer(self):
-        # Timer setup for tracking recording length
-        self.recording_timer = QTimer(self)
-        self.recording_timer.timeout.connect(self.update_recording_length)
-        self.recording_start_time = QTime()
-
-    def update_recording_length(self):
-        # Update the recording length display
-        elapsed_time = self.recording_start_time.elapsed() // 1000
-        self.recording_length_label.setText(f"Recording: {elapsed_time}s")
-
-    def setup_stop_listen_button(self):
-        # Setup the stop listen button
-        self.stop_listen_btn = QPushButton('Stop', self.parent())
-        self.stop_listen_btn.resize(80, 60)
-        self.stop_listen_btn.setStyleSheet("background-color: white;")
-        self.stop_listen_btn.move(900, 600)
-        self.stop_listen_btn.clicked.connect(self.on_stop_listen)
-        self.stop_listen_btn.hide()
-
-    def setup_back_to_home_button(self):
-        # Setup the back to home button
-        self.back_to_home_btn = QPushButton('Home', self.parent())
-        self.back_to_home_btn.setStyleSheet("background-color: white;")
-        self.back_to_home_btn.resize(80, 60)
-        self.back_to_home_btn.move(900, 700)
-        self.back_to_home_btn.clicked.connect(self.on_back_to_home)
-        self.back_to_home_btn.hide()
-
-    def on_stop_listen(self):
+    def on_stop_listen(self, event=None):
         # Handle stop listening: stop timer, process audio, and update UI
-        self.recording_timer.stop()
         self.recording_animation.stop()
-        self.recording_animation_label.hide()
-        self.back_to_home_btn.show()
         self.parent().stop_recording_and_process()
-
-    def on_back_to_home(self):
-        # Transition back to the home screen
-        self.hide()
-        self.parent().transition_to_home()
 
     def hide(self):
         # Hide the recording screen and stop the timer
-        self.recording_timer.stop()
-        self.recording_length_label.hide()
-        self.stop_listen_btn.hide()
-        self.back_to_home_btn.hide()
         self.recording_animation.stop()
         self.recording_animation_label.hide()
 
     def show(self):
         # Show the recording screen and start the timer
-        self.recording_timer.start()
-        self.recording_length_label.show()
-        self.stop_listen_btn.show()
-        self.back_to_home_btn.show()
         self.recording_animation.start()
         self.recording_animation_label.show()
 
@@ -213,18 +153,26 @@ class ImageView(QWidget):
 
         # Create a QLabel to display the input prompt
         self.input_prompt_label = QLabel(self)
-        font = QFont('Helvetica', 20)
+        font = QFont('Helvetica', 24)
         self.input_prompt_label.setFont(font)
         self.input_prompt_label.setStyleSheet("color: white;")
+        self.input_prompt_label.setWordWrap(True)
+        self.input_prompt_label.setFixedWidth(600)
+        self.input_prompt_label.setAlignment(Qt.AlignCenter)
 
+        # Adjust the size policy to allow vertical expansion
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
+        self.input_prompt_label.setSizePolicy(sizePolicy)
         # Create spacer items
         spacer_top = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        small_spacer = QSpacerItem(20, 16, QSizePolicy.Minimum, QSizePolicy.Fixed)  # Small spacer between text and image
         spacer_bottom = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         # Add the widgets and spacers to the layout
         layout.addItem(spacer_top)
         layout.addWidget(self.input_prompt_label)
         layout.setAlignment(self.input_prompt_label, Qt.AlignTop | Qt.AlignHCenter)
+        layout.addItem(small_spacer)  # Add the small spacer here
         layout.addWidget(self.image_label)
         layout.setAlignment(self.image_label, Qt.AlignVCenter | Qt.AlignHCenter)
         layout.addItem(spacer_bottom)
@@ -368,6 +316,43 @@ class MainWindow(QMainWindow):
         self.chatView = ChatView(self)
         self.imageView = ImageView(self)
         self.translationView = TranslationView(self)
+        self.setup_navButtons()
+
+    def setup_navButtons(self):
+        self.setup_back_to_home_button()
+        self.setup_stop_listen_button()
+
+    def show_navButtons(self):
+        self.stop_listen_btn.show()
+        self.back_to_home_btn.show()
+
+    def setup_stop_listen_button(self):
+        # Setup the stop listen button
+        self.stop_listen_btn = QPushButton('Stop', self)
+        self.stop_listen_btn.resize(80, 60)
+        self.stop_listen_btn.setStyleSheet("background-color: white;")
+        self.stop_listen_btn.move(900, 600)
+        self.stop_listen_btn.clicked.connect(self.on_stop_listen)
+        self.stop_listen_btn.hide()
+
+    def setup_back_to_home_button(self):
+        # Setup the back to home button
+        self.back_to_home_btn = QPushButton('Home', self)
+        self.back_to_home_btn.setStyleSheet("background-color: white;")
+        self.back_to_home_btn.resize(80, 60)
+        self.back_to_home_btn.move(900, 700)
+        self.back_to_home_btn.clicked.connect(self.on_back_to_home)
+        self.back_to_home_btn.hide()
+
+    def on_stop_listen(self):
+        # Handle stop listening: stop timer, process audio, and update UI
+        # self.recording_animation.stop()
+        # self.recording_animation_label.hide()
+        self.stop_recording_and_process()
+
+    def on_back_to_home(self):
+        # Transition back to the home screen
+        self.transition_to_home()
 
     def hide_widgets(self):
         # Hide all widgets
@@ -376,6 +361,8 @@ class MainWindow(QMainWindow):
         self.chatView.hide()
         self.imageView.hide()
         self.translationView.hide()
+        self.stop_listen_btn.hide()
+        self.back_to_home_btn.hide()
 
     def transition_to_record(self):
         # Transition to the recording screen and start recording
@@ -402,6 +389,8 @@ class MainWindow(QMainWindow):
         progress.setValue(1)
         progress.close()
 
+        self.recordingView.hide()
+
         self.process_response(response)
 
     def process_response(self, response):
@@ -418,6 +407,7 @@ class MainWindow(QMainWindow):
             self.layout.addWidget(self.currentWidget)
         else:
             self.chatView.display(response)
+        self.show_navButtons()
         self.update()
 
     def transition_to_home(self):
