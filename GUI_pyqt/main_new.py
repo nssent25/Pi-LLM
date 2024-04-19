@@ -363,18 +363,18 @@ class MainWindow(QMainWindow):
     def setupStopListenButton(self):
         # Setup the stop listen button
         self.stopListenBtn = RoundButton(chr(0xF053), self)
-        size = 75  # Set both width and height to 60 for a circle
+        size = 90  # Set both width and height to 60 for a circle
         self.stopListenBtn.resize(size, size)
-        self.stopListenBtn.move(455, 960)
+        self.stopListenBtn.move(435, 930)
         self.stopListenBtn.clicked.connect(self.processRecording)
         self.stopListenBtn.hide()
 
     def setupBackToHomeButton(self):
         # Setup the back to home button using the custom RoundButton class
         self.backToHomeBtn = RoundButton(chr(0xE5E0), self)
-        size = 75  # Set both width and height to 60 for a circle
+        size = 90  # Set both width and height to 60 for a circle
         self.backToHomeBtn.resize(size, size)
-        self.backToHomeBtn.move(550, 960)
+        self.backToHomeBtn.move(570, 930)
         self.backToHomeBtn.clicked.connect(self.transitionToHome)
         self.backToHomeBtn.hide()
 
