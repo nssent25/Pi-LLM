@@ -344,11 +344,11 @@ class MainWindow(QMainWindow):
         self.setGeometry(0, 0, self.width, self.height)
 
         # Setup the central widget with a black background
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout(self.central_widget)
-        self.central_widget.setLayout(self.layout)
-        self.central_widget.setStyleSheet("background-color: black;")
+        self.mainWidget = QWidget()
+        self.setCentralWidget(self.mainWidget)
+        self.layout = QVBoxLayout(self.mainWidget)
+        self.mainWidget.setLayout(self.layout)
+        self.mainWidget.setStyleSheet("background-color: black;")
         self.currentWidget = None
 
         # instantiate the different views
@@ -391,7 +391,7 @@ class MainWindow(QMainWindow):
     def transitionToRecord(self):
         # Transition to the recording screen and start recording
         self.homeView.hide()
-        self.central_widget.setStyleSheet("background-color: #0e0f20;")
+        self.mainWidget.setStyleSheet("background-color: #0e0f20;")
         self.audioRecorder.start_recording()
         self.recordingView.record()
         print("Recording started...")
@@ -419,7 +419,7 @@ class MainWindow(QMainWindow):
     def processResponse(self, response):
         # Process the response from the server after recording
         response = response.json()
-        self.central_widget.setStyleSheet("background-color: black;")
+        self.mainWidget.setStyleSheet("background-color: black;")
         if response['task'] == 'Image Generation':
             self.imageView.display(response)
             self.currentWidget = self.imageView
@@ -441,7 +441,7 @@ class MainWindow(QMainWindow):
             self.layout.removeWidget(self.currentWidget)
             self.currentWidget = None
         self.hideWidgets()
-        self.central_widget.setStyleSheet("background-color: black;")
+        self.mainWidget.setStyleSheet("background-color: black;")
         self.homeView.raise_()
         self.homeView.show()
         self.update()
