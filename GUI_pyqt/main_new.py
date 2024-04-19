@@ -20,88 +20,91 @@ class CircleWidget(QWidget): # unused
 class HomeView(QWidget):
     def __init__(self, parent=None):
         super(HomeView, self).__init__(parent)
-        self.setup_ui()
+        self.setupUI()
 
-    def setup_ui(self):
+    def setupUI(self):
         # Setup the home screen
-        self.start_listen_label = QLabel(self.parent())
-        self.start_listen_animation = QMovie('assets/homeView.gif')    
-        self.start_listen_label.setMovie(self.start_listen_animation)
-        self.start_listen_label.resize(1080, 1080)
-        self.start_listen_label.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.start_listen_animation.start()
-        self.start_listen_label.mousePressEvent = self.on_start_listen
+        self.startRecordButton = QLabel(self.parent())
+        self.homeAnimation = QMovie('assets/homeView.gif')    
+        self.startRecordButton.setMovie(self.homeAnimation)
+        self.startRecordButton.resize(1080, 1080)
+        self.startRecordButton.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        self.homeAnimation.start()
+        self.startRecordButton.mousePressEvent = self.onStartListen
 
-    def on_start_listen(self, event):
+    def onStartListen(self, event):
         # Transition to the recording UI and start recording
-        self.parent().transition_to_record()
+        self.parent().transitionToRecord()
 
     def hide(self):
         # Hide the home screen
-        self.start_listen_label.hide()
+        self.startRecordButton.hide()
 
     def show(self):
         # Show the home screen
-        self.start_listen_label.show()
+        self.startRecordButton.show()
 
 class RecordingView(QWidget):
     def __init__(self, parent=None):
         super(RecordingView, self).__init__(parent)
-        self.setup_ui()
+        self.setupUI()
 
-    def setup_ui(self):
+    def setupUI(self):
         # Setup recording animation
-        self.recording_animation_label = QLabel(self.parent())
-        self.recording_animation = QMovie('assets/Voice assistant motion effect.gif')
-        self.loading_animation = QMovie('assets/homeView.gif')
-        self.recording_animation_label.setMovie(self.recording_animation)
-        self.recording_animation_label.resize(1080, 1080)
-        self.recording_animation_label.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.recording_animation_label.mousePressEvent = self.on_stop_listen
+        self.stopRecordButton = QLabel(self.parent())
+        self.recordingAnimation = QMovie('assets/Voice assistant motion effect.gif')
+        self.loadingAnimation = QMovie('assets/homeView.gif')
+        self.stopRecordButton.setMovie(self.recordingAnimation)
+        self.stopRecordButton.resize(1080, 1080)
+        self.stopRecordButton.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        self.stopRecordButton.mousePressEvent = self.onStopListen
         self.hide()
         
-    def on_stop_listen(self, event=None):
+    def onStopListen(self, event=None):
         # Go back to the home screen to stop recording
-        self.recording_animation.stop()
-        self.parent().stop_recording_and_process()
+        self.recordingAnimation.stop()
+        self.parent().processRecording()
 
     def record(self):
         # Start the recording animation
-        self.recording_animation.start()
-        self.recording_animation_label.show()
+        self.recordingAnimation.start()
+        self.stopRecordButton.show()
 
-    def loading_screen(self):
+    def loadingScreen(self):
         # Show the processing screen after stopping recording
-        self.recording_animation_label.setMovie(self.loading_animation)
-        self.recording_animation_label.show()
-        self.loading_animation.start()
+        self.stopRecordButton.setMovie(self.loadingAnimation)
+        self.stopRecordButton.show()
+        self.loadingAnimation.start()
 
-    def stop_loading_screen(self):
+    def stopLoadingScreen(self):
         # Show the processing screen after stopping recording
-        self.loading_animation.stop()
-        self.recording_animation_label.setMovie(self.recording_animation)
+        self.loadingAnimation.stop()
+        self.stopRecordButton.setMovie(self.recordingAnimation)
 
     def hide(self):
         # Hide the recording screen and stop the timer
-        self.recording_animation.stop()
-        self.recording_animation_label.hide()
+        self.recordingAnimation.stop()
+        self.stopRecordButton.hide()
 
     def show(self):
         # Show the recording screen and start the timer
-        self.recording_animation.start()
-        self.recording_animation_label.show()
+        self.recordingAnimation.start()
+        self.stopRecordButton.show()
 
 class ChatView(QWidget):
     def __init__(self, parent=None):
         super(ChatView, self).__init__(parent)
-        self.setup_ui()
+        self.setupUI()
         self.conversation = []
 
-    def setup_ui(self):
+    def setupUI(self):
         # Setup the textbox for displaying processed text
         self.textbox = QTextEdit(self.parent())
-        self.textbox.resize(671, 509)
-        self.textbox.move(187, 200)
+        self.textbox.setReadOnly(True)
+        self.textbox.setFont(QFont('Helvetica', 24))
+        self.textbox.resize(671, 671)
+        self.textbox.move(204, 204)
+        self.textbox.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.textbox.setStyleSheet("color: white; background-color: black;")
         self.hide()
 
@@ -114,11 +117,12 @@ class ChatView(QWidget):
         self.textbox.show()
 
     def display(self, response):
-        # Display the text in the chat screen
-        text = 'User: ' + response['input'] + '\nAssistant: ' + response['response'] + '\n'
+        # Display the text in the chat screen with HTML formatting
+        userText = f'<i><font color="#9c9c9c">{response["input"]}</font></i>'
+        assistantText = f'{response["response"]}'
+        text = f'{userText}<br>{assistantText}<br><br>'
         self.conversation.append(text)
-        screen = '\n'.join(self.conversation)
-        #self.textbox.setText(text)
+        screen = ''.join(self.conversation)  # Use ''.join to concatenate without additional newlines
         self.textbox.setText(screen)
         self.show()
 
@@ -139,79 +143,79 @@ class RoundedImageLabel(QLabel):
 class ImageView(QWidget):
     def __init__(self, parent=None):
         super(ImageView, self).__init__(parent)
-        self.setup_ui()
+        self.setupUI()
 
-    def setup_ui(self):
+    def setupUI(self):
         # Create a QLabel to display the image
-        self.image_size = 700
-        self.image_label = RoundedImageLabel(self.image_size // 10)
-        self.image_label.setGeometry(0, 0, self.image_size, self.image_size)
+        self.imageSize = 700
+        self.imageLabel = RoundedImageLabel(self.imageSize // 10)
+        self.imageLabel.setGeometry(0, 0, self.imageSize, self.imageSize)
 
         # Create a QVBoxLayout
         layout = QVBoxLayout(self)
 
         # Create a QLabel to display the input prompt
-        self.input_prompt_label = QLabel(self)
+        self.inputPromptLabel = QLabel(self)
         font = QFont('Helvetica', 24)
-        self.input_prompt_label.setFont(font)
-        self.input_prompt_label.setStyleSheet("color: white;")
-        self.input_prompt_label.setWordWrap(True)
-        self.input_prompt_label.setFixedWidth(600)
-        self.input_prompt_label.setAlignment(Qt.AlignCenter)
+        self.inputPromptLabel.setFont(font)
+        self.inputPromptLabel.setStyleSheet("color: white;")
+        self.inputPromptLabel.setWordWrap(True)
+        self.inputPromptLabel.setFixedWidth(600)
+        self.inputPromptLabel.setAlignment(Qt.AlignCenter)
 
         # Adjust the size policy to allow vertical expansion
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
-        self.input_prompt_label.setSizePolicy(sizePolicy)
+        self.inputPromptLabel.setSizePolicy(sizePolicy)
         # Create spacer items
-        spacer_top = QSpacerItem(20, 80, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        small_spacer = QSpacerItem(20, 16, QSizePolicy.Minimum, QSizePolicy.Fixed)  # Small spacer between text and image
-        spacer_bottom = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        topSpacer = QSpacerItem(20, 80, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        smallSpacer = QSpacerItem(20, 16, QSizePolicy.Minimum, QSizePolicy.Fixed)  # Small spacer between text and image
+        bottomSpacer = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         # Add the widgets and spacers to the layout
-        layout.addItem(spacer_top)
-        layout.addWidget(self.input_prompt_label)
-        layout.setAlignment(self.input_prompt_label, Qt.AlignTop | Qt.AlignHCenter)
-        layout.addItem(small_spacer)  # Add the small spacer here
-        layout.addWidget(self.image_label)
-        layout.setAlignment(self.image_label, Qt.AlignVCenter | Qt.AlignHCenter)
-        layout.addItem(spacer_bottom)
+        layout.addItem(topSpacer)
+        layout.addWidget(self.inputPromptLabel)
+        layout.setAlignment(self.inputPromptLabel, Qt.AlignTop | Qt.AlignHCenter)
+        layout.addItem(smallSpacer)  # Add the small spacer here
+        layout.addWidget(self.imageLabel)
+        layout.setAlignment(self.imageLabel, Qt.AlignVCenter | Qt.AlignHCenter)
+        layout.addItem(bottomSpacer)
 
         self.hide()
 
     def hide(self):
         # Hide the image view
-        self.image_label.clear()
-        self.image_label.hide()
-        self.input_prompt_label.hide()
+        self.imageLabel.clear()
+        self.imageLabel.hide()
+        self.inputPromptLabel.hide()
 
     def show(self):
         # Show the image view
-        self.image_label.show()
-        self.input_prompt_label.show()
+        self.imageLabel.show()
+        self.inputPromptLabel.show()
 
     def display(self, response):
         # Convert the base64 image data to QPixmap and display it
-        image = self.base64_to_image(response)
-        self.image_label.setPixmap(image)
-        self.input_prompt_label.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
+        image = self.base64ToImg(response)
+        self.imageLabel.setPixmap(image)
+        self.inputPromptLabel.setText(f'<b><font color="grey">Prompt:</font></b> {response["input"]}')
         self.show()
 
-    def base64_to_image(self, response):
+    def base64ToImg(self, response):
         # Convert base64 string to QPixmap
-        img_bytes = base64.b64decode(response['response'])
-        image = QImage.fromData(img_bytes)
+        imgDat = base64.b64decode(response['response'])
+        image = QImage.fromData(imgDat)
         pixmap = QPixmap.fromImage(image)
         filename = 'saved/' + response['input'] + str(QDateTime.currentMSecsSinceEpoch()) + '.jpg'
         pixmap.save(filename)
-        pixmap = pixmap.scaled(self.image_size, self.image_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap = pixmap.scaled(self.imageSize, self.imageSize, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         return pixmap
 
 class TranslationView(QWidget):
     def __init__(self, parent=None):
         super(TranslationView, self).__init__(parent)
-        self.setup_ui()
+        self.setupUI()
 
-    def setup_ui(self):
+    def setupUI(self):
         # Set the style of the widget to look like a rounded rectangle card
         self.setStyleSheet("""
             QWidget {
@@ -332,7 +336,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Initialize the main window, audio recorder, and server client
-        self.audio_recorder = AudioRecorder()
+        self.audioRecorder = AudioRecorder()
         self.server = AudioServerClient() 
         self.height = 1080
         self.width = 1080
@@ -353,70 +357,66 @@ class MainWindow(QMainWindow):
         self.chatView = ChatView(self)
         self.imageView = ImageView(self)
         self.translationView = TranslationView(self)
-        self.setup_back_to_home_button()
-        self.setup_stop_listen_button()
+        self.setupBackToHomeButton()
+        self.setupStopListenButton()
 
-    def setup_stop_listen_button(self):
+    def setupStopListenButton(self):
         # Setup the stop listen button
-        self.stop_listen_btn = RoundButton(chr(0xF053), self)
+        self.stopListenBtn = RoundButton(chr(0xF053), self)
         size = 75  # Set both width and height to 60 for a circle
-        self.stop_listen_btn.resize(size, size)
-        self.stop_listen_btn.move(455, 960)
-        self.stop_listen_btn.clicked.connect(self.stop_recording_and_process)
-        self.stop_listen_btn.hide()
+        self.stopListenBtn.resize(size, size)
+        self.stopListenBtn.move(455, 960)
+        self.stopListenBtn.clicked.connect(self.processRecording)
+        self.stopListenBtn.hide()
 
-    def setup_back_to_home_button(self):
+    def setupBackToHomeButton(self):
         # Setup the back to home button using the custom RoundButton class
-        self.back_to_home_btn = RoundButton(chr(0xE5E0), self)
+        self.backToHomeBtn = RoundButton(chr(0xE5E0), self)
         size = 75  # Set both width and height to 60 for a circle
-        self.back_to_home_btn.resize(size, size)
-        self.back_to_home_btn.move(550, 960)
-        self.back_to_home_btn.clicked.connect(self.transition_to_home)
-        self.back_to_home_btn.hide()
+        self.backToHomeBtn.resize(size, size)
+        self.backToHomeBtn.move(550, 960)
+        self.backToHomeBtn.clicked.connect(self.transitionToHome)
+        self.backToHomeBtn.hide()
 
-    def hide_widgets(self):
+    def hideWidgets(self):
         # Hide all widgets
         self.homeView.hide()
         self.recordingView.hide()
         self.chatView.hide()
         self.imageView.hide()
         self.translationView.hide()
-        self.stop_listen_btn.hide()
-        self.back_to_home_btn.hide()
+        self.stopListenBtn.hide()
+        self.backToHomeBtn.hide()
 
-    def transition_to_record(self):
+    def transitionToRecord(self):
         # Transition to the recording screen and start recording
         self.homeView.hide()
         self.central_widget.setStyleSheet("background-color: #0e0f20;")
-        self.audio_recorder.start_recording()
+        self.audioRecorder.start_recording()
         self.recordingView.record()
         print("Recording started...")
 
-    def stop_recording_and_process(self):
+    def processRecording(self):
         # Stop recording and process the audio file
-        self.audio_recorder.stop_recording()
-        self.recordingView.loading_screen()
+        self.audioRecorder.stop_recording()
+        self.recordingView.loadingScreen()
         print("Recording stopped, processing...")
-
         # Create a QProgressDialog
         # progress = QProgressDialog("Thinking...", None, 0, 1, self)
         # progress.setWindowModality(Qt.WindowModal)
         # progress.show()
         # QApplication.processEvents()
-
         # Process the audio file
         response = self.server.send_audio("recording.wav")
         print("Processing complete!")
         # Close the QProgressDialog
         # progress.setValue(1)
         # progress.close()
-
-        self.recordingView.stop_loading_screen()
+        self.recordingView.stopLoadingScreen()
         self.recordingView.hide()
+        self.processResponse(response)
 
-        self.process_response(response)
-
-    def process_response(self, response):
+    def processResponse(self, response):
         # Process the response from the server after recording
         response = response.json()
         self.central_widget.setStyleSheet("background-color: black;")
@@ -430,17 +430,17 @@ class MainWindow(QMainWindow):
             self.layout.addWidget(self.currentWidget)
         else:
             self.chatView.display(response)
-        self.stop_listen_btn.show()
-        self.back_to_home_btn.show()
+        self.stopListenBtn.show()
+        self.backToHomeBtn.show()
         self.update()
 
-    def transition_to_home(self):
+    def transitionToHome(self):
         # Reset UI elements to initial state (home screen)
         if self.currentWidget:
             print('removing current widget')
             self.layout.removeWidget(self.currentWidget)
             self.currentWidget = None
-        self.hide_widgets()
+        self.hideWidgets()
         self.central_widget.setStyleSheet("background-color: black;")
         self.homeView.raise_()
         self.homeView.show()
