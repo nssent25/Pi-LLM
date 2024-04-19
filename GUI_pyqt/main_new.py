@@ -102,8 +102,9 @@ class ChatView(QWidget):
         self.textbox = QTextEdit(self.parent())
         self.textbox.setReadOnly(True)
         self.textbox.setFont(QFont('Helvetica', 24))
-        self.textbox.resize(671, 671)
-        self.textbox.move(204, 204)
+        self.textbox.resize(760, 700)
+        # center on 1080x1080 screen
+        self.textbox.move(160, 190)
         self.textbox.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.textbox.setStyleSheet("color: white; background-color: black;")
         self.hide()
@@ -298,7 +299,7 @@ class RoundButton(QPushButton):
     def __init__(self, title, parent=None):
         super(RoundButton, self).__init__(title, parent)
         self.title = title
-        self.setFont(QFont('Material Icons Outlined', 48))
+        self.setFont(QFont('Material Icons Outlined', 50))
 
         # Connect signals to change the button state
         self.pressed.connect(self.onPressed)
@@ -363,18 +364,18 @@ class MainWindow(QMainWindow):
     def setupStopListenButton(self):
         # Setup the stop listen button
         self.stopListenBtn = RoundButton(chr(0xF053), self)
-        size = 90  # Set both width and height to 60 for a circle
+        size = 100  # Set both width and height to 60 for a circle
         self.stopListenBtn.resize(size, size)
-        self.stopListenBtn.move(435, 930)
+        self.stopListenBtn.move(600, 930)
         self.stopListenBtn.clicked.connect(self.processRecording)
         self.stopListenBtn.hide()
 
     def setupBackToHomeButton(self):
         # Setup the back to home button using the custom RoundButton class
         self.backToHomeBtn = RoundButton(chr(0xE5E0), self)
-        size = 90  # Set both width and height to 60 for a circle
+        size = 100  # Set both width and height to 60 for a circle
         self.backToHomeBtn.resize(size, size)
-        self.backToHomeBtn.move(570, 930)
+        self.backToHomeBtn.move(405, 930)
         self.backToHomeBtn.clicked.connect(self.transitionToHome)
         self.backToHomeBtn.hide()
 
