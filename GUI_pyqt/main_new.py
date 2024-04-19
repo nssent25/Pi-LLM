@@ -23,36 +23,25 @@ class HomeView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        # Setup the start listen button with an image icon
-        self.start_listen_pic = QPixmap('assets/recordButton.jpg')
-        # Scale the QPixmap
-        scaled_pic = self.start_listen_pic.scaled(self.start_listen_pic.size() * 2, 
-                                                  Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        icon = QIcon(scaled_pic)
-        self.start_listen_btn = QPushButton('', self.parent())
-        self.start_listen_btn.setIcon(icon)
-        self.start_listen_btn.setIconSize(scaled_pic.size())
-        self.start_listen_btn.resize(scaled_pic.width(), scaled_pic.height())
-        # Calculate the top-left position to center the button at (540, 540)
-        x = self.parent().width // 2 - self.start_listen_btn.width() // 2
-        y = self.parent().height // 2 - self.start_listen_btn.height() // 2
-        self.start_listen_btn.move(x, y)
-        # Make the button colorless
-        self.start_listen_btn.setStyleSheet("background-color: transparent; border: none;")
-        self.start_listen_btn.clicked.connect(self.on_start_listen)
+        self.start_listen_label = QLabel(self.parent())
+        self.start_listen_animation = QMovie('assets/homeView.gif')    
+        self.start_listen_label.setMovie(self.start_listen_animation)
+        self.start_listen_label.resize(1080, 1080)
+        self.start_listen_label.setAlignment(Qt.AlignCenter)
+        self.start_listen_animation.start()
+        self.start_listen_label.mousePressEvent = self.on_start_listen
 
-    def on_start_listen(self):
+    def on_start_listen(self, event):
         # Transition to the recording UI and start recording
-        self.hide()
         self.parent().transition_to_record()
 
     def hide(self):
         # Hide the home screen
-        self.start_listen_btn.hide()
+        self.start_listen_label.hide()
 
     def show(self):
         # Show the home screen
-        self.start_listen_btn.show()
+        self.start_listen_label.show()
 
 class RecordingView(QWidget):
     def __init__(self, parent=None):
@@ -366,6 +355,7 @@ class MainWindow(QMainWindow):
 
     def transition_to_record(self):
         # Transition to the recording screen and start recording
+        self.homeView.hide()
         self.central_widget.setStyleSheet("background-color: #0e0f20;")
         self.audio_recorder.start_recording()
         self.recordingView.record()
