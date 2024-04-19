@@ -23,6 +23,7 @@ class HomeView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
+        # Setup the home screen
         self.start_listen_label = QLabel(self.parent())
         self.start_listen_animation = QMovie('assets/homeView.gif')    
         self.start_listen_label.setMovie(self.start_listen_animation)
@@ -49,27 +50,37 @@ class RecordingView(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setup_recording_animation()
-        self.hide()
-        
-    def record(self):
-        self.recording_animation_label.show()
-        self.recording_animation.start()
-
-    def setup_recording_animation(self):
         # Setup recording animation
         self.recording_animation_label = QLabel(self.parent())
         self.recording_animation = QMovie('assets/Voice assistant motion effect.gif')
+        self.loading_animation = QMovie('assets/homeView.gif')
         self.recording_animation_label.setMovie(self.recording_animation)
-        self.recording_animation_label.resize(800, 600)
-        self.recording_animation_label.move(145, 276)
-        self.recording_animation_label.hide()
+        self.recording_animation_label.resize(1080, 1080)
+        self.recording_animation_label.setAlignment(Qt.AlignCenter)
         self.recording_animation_label.mousePressEvent = self.on_stop_listen
-
+        self.hide()
+        
     def on_stop_listen(self, event=None):
-        # Handle stop listening: stop timer, process audio, and update UI
+        # Go back to the home screen to stop recording
         self.recording_animation.stop()
         self.parent().stop_recording_and_process()
+
+    def record(self):
+        # Start the recording animation
+        self.recording_animation.start()
+        self.recording_animation_label.show()
+
+    def loading_screen(self):
+        # Show the processing screen after stopping recording
+        self.recording_animation_label.setMovie(self.loading_animation)
+        self.recording_animation_label.show()
+        self.loading_animation.start()
+
+    def stop_loading_screen(self):
+        # Show the processing screen after stopping recording
+        self.loading_animation.stop()
+        self.recording_animation_label.setMovie(self.recording_animation)
+
 
     def hide(self):
         # Hide the recording screen and stop the timer
@@ -305,15 +316,8 @@ class MainWindow(QMainWindow):
         self.chatView = ChatView(self)
         self.imageView = ImageView(self)
         self.translationView = TranslationView(self)
-        self.setup_navButtons()
-
-    def setup_navButtons(self):
         self.setup_back_to_home_button()
         self.setup_stop_listen_button()
-
-    def show_navButtons(self):
-        self.stop_listen_btn.show()
-        self.back_to_home_btn.show()
 
     def setup_stop_listen_button(self):
         # Setup the stop listen button
@@ -321,7 +325,7 @@ class MainWindow(QMainWindow):
         self.stop_listen_btn.resize(80, 60)
         self.stop_listen_btn.setStyleSheet("background-color: white;")
         self.stop_listen_btn.move(900, 600)
-        self.stop_listen_btn.clicked.connect(self.on_stop_listen)
+        self.stop_listen_btn.clicked.connect(self.stop_recording_and_process)
         self.stop_listen_btn.hide()
 
     def setup_back_to_home_button(self):
@@ -330,18 +334,8 @@ class MainWindow(QMainWindow):
         self.back_to_home_btn.setStyleSheet("background-color: white;")
         self.back_to_home_btn.resize(80, 60)
         self.back_to_home_btn.move(900, 700)
-        self.back_to_home_btn.clicked.connect(self.on_back_to_home)
+        self.back_to_home_btn.clicked.connect(self.transition_to_home)
         self.back_to_home_btn.hide()
-
-    def on_stop_listen(self):
-        # Handle stop listening: stop timer, process audio, and update UI
-        # self.recording_animation.stop()
-        # self.recording_animation_label.hide()
-        self.stop_recording_and_process()
-
-    def on_back_to_home(self):
-        # Transition back to the home screen
-        self.transition_to_home()
 
     def hide_widgets(self):
         # Hide all widgets
@@ -364,21 +358,23 @@ class MainWindow(QMainWindow):
     def stop_recording_and_process(self):
         # Stop recording and process the audio file
         self.audio_recorder.stop_recording()
+        self.recordingView.loading_screen()
         print("Recording stopped, processing...")
 
         # Create a QProgressDialog
-        progress = QProgressDialog("Thinking...", None, 0, 1, self)
-        progress.setWindowModality(Qt.WindowModal)
-        progress.show()
-        QApplication.processEvents()
+        # progress = QProgressDialog("Thinking...", None, 0, 1, self)
+        # progress.setWindowModality(Qt.WindowModal)
+        # progress.show()
+        # QApplication.processEvents()
 
         # Process the audio file
         response = self.server.send_audio("recording.wav")
-
+        print("Processing complete!")
         # Close the QProgressDialog
-        progress.setValue(1)
-        progress.close()
+        # progress.setValue(1)
+        # progress.close()
 
+        self.recordingView.stop_loading_screen()
         self.recordingView.hide()
 
         self.process_response(response)
@@ -397,7 +393,8 @@ class MainWindow(QMainWindow):
             self.layout.addWidget(self.currentWidget)
         else:
             self.chatView.display(response)
-        self.show_navButtons()
+        self.stop_listen_btn.show()
+        self.back_to_home_btn.show()
         self.update()
 
     def transition_to_home(self):
