@@ -294,6 +294,7 @@ class RoundButton(QPushButton):
     def __init__(self, title, parent=None):
         super(RoundButton, self).__init__(title, parent)
         self.title = title
+        self.setFont(QFont('Material Icons Outlined', 48))
 
         # Connect signals to change the button state
         self.pressed.connect(self.onPressed)
@@ -357,19 +358,19 @@ class MainWindow(QMainWindow):
 
     def setup_stop_listen_button(self):
         # Setup the stop listen button
-        self.stop_listen_btn = RoundButton('Stop', self)
-        size = 60  # Set both width and height to 60 for a circle
+        self.stop_listen_btn = RoundButton(chr(0xF053), self)
+        size = 75  # Set both width and height to 60 for a circle
         self.stop_listen_btn.resize(size, size)
-        self.stop_listen_btn.move(900, 600)
+        self.stop_listen_btn.move(455, 960)
         self.stop_listen_btn.clicked.connect(self.stop_recording_and_process)
         self.stop_listen_btn.hide()
 
     def setup_back_to_home_button(self):
         # Setup the back to home button using the custom RoundButton class
-        self.back_to_home_btn = RoundButton('Home', self)
-        size = 60  # Set both width and height to 60 for a circle
+        self.back_to_home_btn = RoundButton(chr(0xE5E0), self)
+        size = 75  # Set both width and height to 60 for a circle
         self.back_to_home_btn.resize(size, size)
-        self.back_to_home_btn.move(900, 700)
+        self.back_to_home_btn.move(550, 960)
         self.back_to_home_btn.clicked.connect(self.transition_to_home)
         self.back_to_home_btn.hide()
 
