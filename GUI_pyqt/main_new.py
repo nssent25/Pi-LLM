@@ -163,7 +163,7 @@ class ImageView(QWidget):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
         self.input_prompt_label.setSizePolicy(sizePolicy)
         # Create spacer items
-        spacer_top = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        spacer_top = QSpacerItem(20, 80, QSizePolicy.Minimum, QSizePolicy.Minimum)
         small_spacer = QSpacerItem(20, 16, QSizePolicy.Minimum, QSizePolicy.Fixed)  # Small spacer between text and image
         spacer_bottom = QSpacerItem(20, 165, QSizePolicy.Minimum, QSizePolicy.Fixed)
 
