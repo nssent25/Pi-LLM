@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # Image cache
 saved/
+
+# Mac files
+.DS_Store
