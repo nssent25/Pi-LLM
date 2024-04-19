@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene
-from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath
-from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, pyqtProperty, QPropertyAnimation, QRectF
+from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath, QBrush
+from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, pyqtProperty, QPropertyAnimation, QRectF, Qt, QRect, QPoint
 #import time # Import the time module
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
@@ -28,7 +28,7 @@ class HomeView(QWidget):
         self.start_listen_animation = QMovie('assets/homeView.gif')    
         self.start_listen_label.setMovie(self.start_listen_animation)
         self.start_listen_label.resize(1080, 1080)
-        self.start_listen_label.setAlignment(Qt.AlignCenter)
+        self.start_listen_label.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.start_listen_animation.start()
         self.start_listen_label.mousePressEvent = self.on_start_listen
 
@@ -56,7 +56,7 @@ class RecordingView(QWidget):
         self.loading_animation = QMovie('assets/homeView.gif')
         self.recording_animation_label.setMovie(self.recording_animation)
         self.recording_animation_label.resize(1080, 1080)
-        self.recording_animation_label.setAlignment(Qt.AlignCenter)
+        self.recording_animation_label.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.recording_animation_label.mousePressEvent = self.on_stop_listen
         self.hide()
         
@@ -80,7 +80,6 @@ class RecordingView(QWidget):
         # Show the processing screen after stopping recording
         self.loading_animation.stop()
         self.recording_animation_label.setMovie(self.recording_animation)
-
 
     def hide(self):
         # Hide the recording screen and stop the timer
@@ -291,6 +290,43 @@ class TranslationView(QWidget):
         self.translatedText.setText(response['response'])
         self.show()  # Ensure the widget is visible when updated
 
+class RoundButton(QPushButton):
+    def __init__(self, title, parent=None):
+        super(RoundButton, self).__init__(title, parent)
+        self.title = title
+
+        # Connect signals to change the button state
+        self.pressed.connect(self.onPressed)
+        self.released.connect(self.onReleased)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)  # For smooth edges
+        
+        # Set colors based on the button's state
+        if self.isDown():  # If the button is pressed
+            brushColor = QColor(255, 255, 255, 45)  # Semi-transparent red
+            penColor = QColor(255, 255, 255, 45)
+        else:  # Default state
+            brushColor = QColor(255, 255, 255, 25)  # Very transparent white
+            penColor = QColor(255, 255, 255, 25)
+        
+        painter.setBrush(QBrush(brushColor, Qt.SolidPattern))
+        painter.setPen(QPen(penColor))
+        painter.drawEllipse(0, 0, self.width(), self.height())  # Draw a circle/ellipse that fills the button
+
+        # Set text color
+        painter.setPen(QPen(Qt.white))
+        painter.drawText(QRect(0, 0, self.width(), self.height()), Qt.AlignCenter, self.title)
+
+    def onPressed(self):
+        self.pressed = True
+        self.update()  # Trigger a repaint to update the button's appearance
+
+    def onReleased(self):
+        self.pressed = False
+        self.update()  # Trigger a repaint to update the button's appearance
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -321,18 +357,18 @@ class MainWindow(QMainWindow):
 
     def setup_stop_listen_button(self):
         # Setup the stop listen button
-        self.stop_listen_btn = QPushButton('Stop', self)
-        self.stop_listen_btn.resize(80, 60)
-        self.stop_listen_btn.setStyleSheet("background-color: white;")
+        self.stop_listen_btn = RoundButton('Stop', self)
+        size = 60  # Set both width and height to 60 for a circle
+        self.stop_listen_btn.resize(size, size)
         self.stop_listen_btn.move(900, 600)
         self.stop_listen_btn.clicked.connect(self.stop_recording_and_process)
         self.stop_listen_btn.hide()
 
     def setup_back_to_home_button(self):
-        # Setup the back to home button
-        self.back_to_home_btn = QPushButton('Home', self)
-        self.back_to_home_btn.setStyleSheet("background-color: white;")
-        self.back_to_home_btn.resize(80, 60)
+        # Setup the back to home button using the custom RoundButton class
+        self.back_to_home_btn = RoundButton('Home', self)
+        size = 60  # Set both width and height to 60 for a circle
+        self.back_to_home_btn.resize(size, size)
         self.back_to_home_btn.move(900, 700)
         self.back_to_home_btn.clicked.connect(self.transition_to_home)
         self.back_to_home_btn.hide()
