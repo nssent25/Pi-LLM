@@ -52,9 +52,10 @@ class RecordingView(QWidget):
     def setupUI(self):
         # Setup recording animation
         self.stopRecordButton = QLabel(self.parent())
-        self.recordingAnimation = QMovie('assets/Voice assistant motion effect.gif')
+        self.recordingAnimation = QMovie('assets/recordView.gif')
+        self.transitionAnimation = QMovie('assets/homeTransition.gif')
         self.loadingAnimation = QMovie('assets/homeView.gif')
-        self.stopRecordButton.setMovie(self.recordingAnimation)
+        # self.stopRecordButton.setMovie(self.transitionAnimation)
         self.stopRecordButton.resize(1080, 1080)
         self.stopRecordButton.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.stopRecordButton.mousePressEvent = self.onStopListen
@@ -65,10 +66,20 @@ class RecordingView(QWidget):
         self.recordingAnimation.stop()
         self.parent().processRecording()
 
-    def record(self):
+    def record(self, event=None):
         # Start the recording animation
-        self.recordingAnimation.start()
+        print("Recording function...")
+        self.transitionAnimation.finished.disconnect(self.record)
+        self.stopRecordButton.setMovie(self.recordingAnimation)
         self.stopRecordButton.show()
+        self.recordingAnimation.start()
+
+    def transition(self):
+        # transition by making opacity of transitionAnimation 0 to 100
+        self.stopRecordButton.setMovie(self.transitionAnimation)
+        self.transitionAnimation.start()
+        self.stopRecordButton.show()
+        self.transitionAnimation.finished.connect(self.record)
 
     def loadingScreen(self):
         # Show the processing screen after stopping recording
@@ -381,7 +392,7 @@ class MainWindow(QMainWindow):
 
     def hideWidgets(self):
         # Hide all widgets
-        self.homeView.hide()
+        # self.homeView.hide()
         self.recordingView.hide()
         self.chatView.hide()
         self.imageView.hide()
@@ -392,9 +403,8 @@ class MainWindow(QMainWindow):
     def transitionToRecord(self):
         # Transition to the recording screen and start recording
         self.homeView.hide()
-        self.mainWidget.setStyleSheet("background-color: #0e0f20;")
         self.audioRecorder.start_recording()
-        self.recordingView.record()
+        self.recordingView.transition()
         print("Recording started...")
 
     def processRecording(self):
@@ -420,7 +430,6 @@ class MainWindow(QMainWindow):
     def processResponse(self, response):
         # Process the response from the server after recording
         response = response.json()
-        self.mainWidget.setStyleSheet("background-color: black;")
         if response['task'] == 'Image Generation':
             self.imageView.display(response)
             self.currentWidget = self.imageView
@@ -442,7 +451,6 @@ class MainWindow(QMainWindow):
             self.layout.removeWidget(self.currentWidget)
             self.currentWidget = None
         self.hideWidgets()
-        self.mainWidget.setStyleSheet("background-color: black;")
         self.homeView.raise_()
         self.homeView.show()
         self.update()
