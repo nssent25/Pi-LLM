@@ -117,7 +117,7 @@ class ChatView(QWidget):
         # center on 1080x1080 screen
         self.textbox.move(160, 190)
         self.textbox.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.textbox.setStyleSheet("color: white; background-color: black;")
+        self.textbox.setStyleSheet("color: white; background-color: black; border: 0px;")
         self.hide()
 
     def hide(self):
@@ -250,15 +250,15 @@ class TranslationView(QWidget):
         self.textbox_org.setFont(QFont('Helvetica', 36))
         self.textbox_org.resize(760, 350)
         # center on 1080x1080 screen
-        self.textbox_org.move(160, 90)
+        self.textbox_org.move(160, 220)
         self.textbox_tar = QTextEdit(self.parent())
         self.textbox_tar.setReadOnly(True)
         self.textbox_tar.setFont(QFont('Helvetica', 36))
         self.textbox_tar.resize(760, 350)
         # center on 1080x1080 screen
-        self.textbox_tar.move(160, 490)
-        self.textbox_org.setStyleSheet("color: white; background-color: black;")
-        self.textbox_tar.setStyleSheet("color: white; background-color: black;")
+        self.textbox_tar.move(160, 560)
+        self.textbox_org.setStyleSheet("color: white; background-color: black; border: 0px;")
+        self.textbox_tar.setStyleSheet("color: white; background-color: black; border: 0px;")
 
         self.hide()
 
@@ -277,8 +277,8 @@ class TranslationView(QWidget):
         translatlang = f'{response["response"]}'
 
         # Add the source and destination language tag to the textboxes
-        sourcetag = f'<b><font color="#9c9c9c">{response["source"]}</font></b>'
-        desttag = f'<b><font color="#9c9c9c">{response["language"]}</font></b>'
+        sourcetag = f'<b><font size="1" color="#9c9c9c">{response["source"].capitalize()}</font></b>'
+        desttag = f'<b><font size="1" color="#9c9c9c">{response["language"].capitalize()}</font></b>'
 
         # Add the source and destination language tag to the textboxes
         originallang = f'{sourcetag}<br>{originallang}<br><br>'
