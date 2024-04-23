@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsOpacityEffect
 from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath, QBrush
-from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, pyqtProperty, QPropertyAnimation, QRectF, Qt, QRect, QPoint
+from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, pyqtProperty, QPropertyAnimation, QRectF, Qt, QRect, QPoint, QPointF, QEasingCurve
 #import time # Import the time module
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
@@ -54,26 +54,19 @@ class RecordingView(QWidget):
         self.stopRecordButton = QLabel(self.parent())
         self.recordingAnimation = QMovie('assets/recordView.gif')
         self.transitionAnimation = QMovie('assets/homeTransition.gif')
+        self.transitionAnimation.setSpeed(250)
         self.loadingAnimation = QMovie('assets/homeView.gif')
-        # self.stopRecordButton.setMovie(self.transitionAnimation)
+
         self.stopRecordButton.resize(1080, 1080)
         self.stopRecordButton.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.stopRecordButton.mousePressEvent = self.onStopListen
+
+        self.loadingScreen = QLabel(self.parent())
+        self.loadingScreen.resize(1080, 1080)
+        self.loadingScreen.setMovie(self.loadingAnimation)
+        self.loadingScreen.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.hide()
         
-    def onStopListen(self, event=None):
-        # Go back to the home screen to stop recording
-        self.recordingAnimation.stop()
-        self.parent().processRecording()
-
-    def record(self, event=None):
-        # Start the recording animation
-        print("Recording function...")
-        self.transitionAnimation.finished.disconnect(self.record)
-        self.stopRecordButton.setMovie(self.recordingAnimation)
-        self.stopRecordButton.show()
-        self.recordingAnimation.start()
-
     def transition(self):
         # transition by making opacity of transitionAnimation 0 to 100
         self.stopRecordButton.setMovie(self.transitionAnimation)
@@ -81,21 +74,49 @@ class RecordingView(QWidget):
         self.stopRecordButton.show()
         self.transitionAnimation.finished.connect(self.record)
 
-    def loadingScreen(self):
-        # Show the processing screen after stopping recording
-        self.stopRecordButton.setMovie(self.loadingAnimation)
+    def record(self, event=None):
+        # Start the recording animation
+        self.stopRecordButton.setMovie(self.recordingAnimation)
         self.stopRecordButton.show()
+        self.recordingAnimation.start()
+
+    def onStopListen(self, event=None):
+        # Go back to the home screen to stop recording
+        self.recordingAnimation.stop()
+        self.stopRecordButton.hide()
+        print("hide recording screen")
+        self.showLoadingScreen()
+        self.parent().processRecording()
+
+    def showLoadingScreen(self):
+        # # Apply QGraphicsOpacityEffect to the widget
+        # opacityEffect = QGraphicsOpacityEffect(self.loadingScreen)
+        # self.loadingScreen.setGraphicsEffect(opacityEffect)
+
+        # # Create QPropertyAnimation to animate the opacity
+        # opacityAnimation = QPropertyAnimation(opacityEffect, b"opacity")
+        # opacityAnimation.setDuration(2000)  # 2 seconds
+        # opacityAnimation.setStartValue(0)  # Start at fully transparent
+        # opacityAnimation.setEndValue(100)  # End at fully opaque
+        # opacityAnimation.setEasingCurve(QEasingCurve.Linear)  # Linear change in opacity
+        # opacityAnimation.start()
+
+        # Start the loading animation
+        self.loadingScreen.raise_()
         self.loadingAnimation.start()
+        self.loadingScreen.show()
 
     def stopLoadingScreen(self):
         # Show the processing screen after stopping recording
         self.loadingAnimation.stop()
-        self.stopRecordButton.setMovie(self.recordingAnimation)
+        self.loadingScreen.hide()
 
     def hide(self):
         # Hide the recording screen and stop the timer
         self.recordingAnimation.stop()
+        self.loadingAnimation.stop()
         self.stopRecordButton.hide()
+        self.loadingScreen.hide()
 
     def show(self):
         # Show the recording screen and start the timer
@@ -117,7 +138,7 @@ class ChatView(QWidget):
         # center on 1080x1080 screen
         self.textbox.move(160, 190)
         self.textbox.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.textbox.setStyleSheet("color: white; background-color: black;")
+        self.textbox.setStyleSheet("color: white; background-color: black; border: 0px;")
         self.hide()
 
     def hide(self):
@@ -410,7 +431,7 @@ class MainWindow(QMainWindow):
     def processRecording(self):
         # Stop recording and process the audio file
         self.audioRecorder.stop_recording()
-        self.recordingView.loadingScreen()
+        # self.recordingView.showLoadingScreen()
         print("Recording stopped, processing...")
         # Create a QProgressDialog
         # progress = QProgressDialog("Thinking...", None, 0, 1, self)
@@ -423,7 +444,7 @@ class MainWindow(QMainWindow):
         # Close the QProgressDialog
         # progress.setValue(1)
         # progress.close()
-        self.recordingView.stopLoadingScreen()
+        # self.recordingView.stopLoadingScreen()
         self.recordingView.hide()
         self.processResponse(response)
 
