@@ -264,67 +264,50 @@ class TranslationView(QWidget):
             }
         """)
 
-        # Create a vertical layout to stack the widgets
-        layout = QVBoxLayout(self)
+        # create two textboxes for the original and translated text
+        self.textbox_org = QTextEdit(self.parent())
+        self.textbox_org.setReadOnly(True)
+        self.textbox_org.setFont(QFont('Helvetica', 36))
+        self.textbox_org.resize(760, 350)
+        # center on 1080x1080 screen
+        self.textbox_org.move(160, 220)
+        self.textbox_tar = QTextEdit(self.parent())
+        self.textbox_tar.setReadOnly(True)
+        self.textbox_tar.setFont(QFont('Helvetica', 36))
+        self.textbox_tar.resize(760, 350)
+        # center on 1080x1080 screen
+        self.textbox_tar.move(160, 560)
+        self.textbox_org.setStyleSheet("color: white; background-color: black; border: 0px;")
+        self.textbox_tar.setStyleSheet("color: white; background-color: black; border: 0px;")
 
-        # Label and text edit for source language
-        self.sourceLangLabel = QLabel("Source Language:", self)
-        layout.addWidget(self.sourceLangLabel)
-        self.sourceLangText = QLabel(self)
-        layout.addWidget(self.sourceLangText)
-
-        # Label and text edit for destination language
-        self.destLangLabel = QLabel("Destination Language:", self)
-        layout.addWidget(self.destLangLabel)
-        self.destLangText = QLabel(self)
-        layout.addWidget(self.destLangText)
-
-        # Label and text edit for original text
-        self.originalTextLabel = QLabel("Original Text:", self)
-        layout.addWidget(self.originalTextLabel)
-        self.originalText = QTextEdit(self)
-        self.originalText.setReadOnly(True)
-        layout.addWidget(self.originalText)
-
-        # Label and text edit for translated text
-        self.translatedTextLabel = QLabel("Translated Text:", self)
-        layout.addWidget(self.translatedTextLabel)
-        self.translatedText = QTextEdit(self)
-        self.translatedText.setReadOnly(True)
-        layout.addWidget(self.translatedText)
-
-        # Set the main layout of the widget
-        self.setLayout(layout)
         self.hide()
 
     def hide(self):
-        # Hide the translation view
-        self.sourceLangLabel.hide()
-        self.sourceLangText.hide()
-        self.destLangLabel.hide()
-        self.destLangText.hide()
-        self.originalTextLabel.hide()
-        self.originalText.hide()
-        self.translatedTextLabel.hide()
-        self.translatedText.hide()
+
+        self.textbox_org.hide()
+        self.textbox_tar.hide()
 
     def show(self):
-        # Show the translation view
-        self.sourceLangLabel.show()
-        self.sourceLangText.show()
-        self.destLangLabel.show()
-        self.destLangText.show()
-        self.originalTextLabel.show()
-        self.originalText.show()
-        self.translatedTextLabel.show()
-        self.translatedText.show()
+        self.textbox_org.show()
+        self.textbox_tar.show()
 
     def display(self, response):
-        # Method to update the text fields with the translation data
-        self.sourceLangText.setText(response['source'])
-        self.destLangText.setText(response['language'])
-        self.originalText.setText(response['input'])
-        self.translatedText.setText(response['response'])
+        # Display the original and translated text with HTML formatting
+        originallang = f'<font>{response["input"]}</font>'
+        translatlang = f'{response["response"]}'
+
+        # Add the source and destination language tag to the textboxes
+        sourcetag = f'<b><font size="1" color="#9c9c9c">{response["source"].capitalize()}</font></b>'
+        desttag = f'<b><font size="1" color="#9c9c9c">{response["language"].capitalize()}</font></b>'
+
+        # Add the source and destination language tag to the textboxes
+        originallang = f'{sourcetag}<br>{originallang}<br><br>'
+        translatlang = f'{desttag}<br>{translatlang}<br><br>'
+
+        # Set the text of the textboxes
+        self.textbox_org.setText(originallang)
+        self.textbox_tar.setText(translatlang)
+
         self.show()  # Ensure the widget is visible when updated
 
 class RoundButton(QPushButton):
