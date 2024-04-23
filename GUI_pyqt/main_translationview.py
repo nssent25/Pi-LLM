@@ -118,6 +118,8 @@ class ChatView(QWidget):
         self.textbox.move(160, 190)
         self.textbox.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.textbox.setStyleSheet("color: white; background-color: black; border: 0px;")
+        self.timer = QTimer() # Create a QTimer to contol animation
+        self.timer.timeout.connect(self.display_next_character)
         self.hide()
 
     def hide(self):
@@ -128,15 +130,23 @@ class ChatView(QWidget):
         # Show the chat screen
         self.textbox.show()
 
+    def display_next_character(self):
+        if self.text_index < len(self.current_text):
+            self.textbox.setText(self.current_text[:self.text_index])
+            self.text_index += 1
+        else:
+            self.timer.stop()  # Stop the timer when the full conversation is displayed
+
+
     def display(self, response):
         # Display the text in the chat screen with HTML formatting
         userText = f'<i><font color="#9c9c9c">{response["input"]}</font></i>'
         assistantText = f'{response["response"]}'
-        text = f'{userText}<br>{assistantText}<br><br>'
-        # self.conversation.append(text)
-        # screen = ''.join(self.conversation)  # Use ''.join to concatenate without additional newlines
-        # self.textbox.setText(screen)
-        self.textbox.setText(text)
+        self.textbox.setText(userText)
+        self.text_index = len(userText)
+        self.current_text = f'{userText}<br>{assistantText}<br><br>'
+        self.timer.start(30)  # Start/restart the tim
+
         self.show()
 
 class RoundedImageLabel(QLabel):
