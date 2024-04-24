@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QProgressDialog, QSizePolicy, QSpacerItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsOpacityEffect
-from PyQt5.QtGui import QPixmap, QIcon, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath, QBrush
-from PyQt5.QtCore import QTimer, QTime, Qt, QDateTime, pyqtProperty, QPropertyAnimation, QRectF, Qt, QRect, QPoint, QPointF, QEasingCurve
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTextEdit, QWidget, QVBoxLayout, QSizePolicy, QSpacerItem, QGraphicsOpacityEffect
+from PyQt5.QtGui import QPixmap, QMovie, QImage, QPainter, QPen, QFont, QColor, QPainterPath, QBrush
+from PyQt5.QtCore import QTimer, Qt, QDateTime, pyqtProperty, QPropertyAnimation, Qt, QRect, QEasingCurve, QObject, pyqtSignal, QThread
 #import time # Import the time module
 from audio import AudioRecorder  # Import the AudioRecorder class
 from client import AudioServerClient  # Import the AudioServerClient class
@@ -51,20 +51,21 @@ class RecordingView(QWidget):
 
     def setupUI(self):
         # Setup recording animation
+        self.loadingAnimation = QMovie('assets/homeView.gif')
+        self.loadingScreen = QLabel(self.parent())
+        self.loadingScreen.resize(1080, 1080)
+        self.loadingScreen.setMovie(self.loadingAnimation)
+        self.loadingScreen.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+
         self.stopRecordButton = QLabel(self.parent())
         self.recordingAnimation = QMovie('assets/recordView.gif')
         self.transitionAnimation = QMovie('assets/homeTransition.gif')
         self.transitionAnimation.setSpeed(250)
-        self.loadingAnimation = QMovie('assets/homeView.gif')
 
         self.stopRecordButton.resize(1080, 1080)
         self.stopRecordButton.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.stopRecordButton.mousePressEvent = self.onStopListen
 
-        self.loadingScreen = QLabel(self.parent())
-        self.loadingScreen.resize(1080, 1080)
-        self.loadingScreen.setMovie(self.loadingAnimation)
-        self.loadingScreen.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         self.hide()
         
     def transition(self):
@@ -83,39 +84,36 @@ class RecordingView(QWidget):
     def onStopListen(self, event=None):
         # Go back to the home screen to stop recording
         self.recordingAnimation.stop()
-        self.stopRecordButton.hide()
-        print("hide recording screen")
+        # self.stopRecordButton.hide()
+        print("onstoplisten called")
         self.showLoadingScreen()
-        self.parent().processRecording()
+        # self.parent().processRecording()
 
     def showLoadingScreen(self):
+        # Start the loading animation
+        self.loadingScreen.raise_()
+        self.loadingAnimation.start()
+        self.loadingScreen.show()
+
         # # Apply QGraphicsOpacityEffect to the widget
         # opacityEffect = QGraphicsOpacityEffect(self.loadingScreen)
         # self.loadingScreen.setGraphicsEffect(opacityEffect)
 
         # # Create QPropertyAnimation to animate the opacity
         # opacityAnimation = QPropertyAnimation(opacityEffect, b"opacity")
-        # opacityAnimation.setDuration(2000)  # 2 seconds
+        # opacityAnimation.setDuration(500)  # 2 seconds
         # opacityAnimation.setStartValue(0)  # Start at fully transparent
-        # opacityAnimation.setEndValue(100)  # End at fully opaque
+        # opacityAnimation.setEndValue(1)  # End at fully opaque
         # opacityAnimation.setEasingCurve(QEasingCurve.Linear)  # Linear change in opacity
         # opacityAnimation.start()
 
-        # Start the loading animation
-        self.loadingScreen.raise_()
-        self.loadingAnimation.start()
-        self.loadingScreen.show()
-
-    def stopLoadingScreen(self):
-        # Show the processing screen after stopping recording
-        self.loadingAnimation.stop()
-        self.loadingScreen.hide()
+        self.parent().processRecording()
 
     def hide(self):
         # Hide the recording screen and stop the timer
         self.recordingAnimation.stop()
-        self.loadingAnimation.stop()
         self.stopRecordButton.hide()
+        self.loadingAnimation.stop()
         self.loadingScreen.hide()
 
     def show(self):
@@ -358,6 +356,18 @@ class RoundButton(QPushButton):
         self.pressed = False
         self.update()  # Trigger a repaint to update the button's appearance
 
+class AudioWorker(QObject):
+    finished = pyqtSignal(object)
+
+    def __init__(self, client, audio_file):
+        super().__init__()
+        self.client = client
+        self.audio_file = audio_file
+
+    def run(self):
+        response = self.client.send_audio(self.audio_file)
+        self.finished.emit(response)
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -422,27 +432,28 @@ class MainWindow(QMainWindow):
         print("Recording started...")
 
     def processRecording(self):
-        # Stop recording and process the audio file
+        # Stop recording
         self.audioRecorder.stop_recording()
-        # self.recordingView.showLoadingScreen()
         print("Recording stopped, processing...")
-        # Create a QProgressDialog
-        # progress = QProgressDialog("Thinking...", None, 0, 1, self)
-        # progress.setWindowModality(Qt.WindowModal)
-        # progress.show()
-        # QApplication.processEvents()
-        # Process the audio file
-        response = self.server.send_audio("recording.wav")
-        print("Processing complete!")
-        # Close the QProgressDialog
-        # progress.setValue(1)
-        # progress.close()
-        # self.recordingView.stopLoadingScreen()
-        self.recordingView.hide()
-        self.processResponse(response)
+
+        # Setup the worker and thread
+        self.thread = QThread()
+        self.worker = AudioWorker(self.server, "recording.wav")
+        self.worker.moveToThread(self.thread)
+        # Connect signals
+        self.worker.finished.connect(self.processResponse)
+        self.thread.started.connect(self.worker.run)
+        # Cleanup
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        # Start the thread
+        self.thread.start()
 
     def processResponse(self, response):
         # Process the response from the server after recording
+        print("response received")
+        self.recordingView.hide()
         response = response.json()
         if response['task'] == 'Image Generation':
             self.imageView.display(response)
