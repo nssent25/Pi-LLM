@@ -51,7 +51,7 @@ class RecordingView(QWidget):
 
     def setupUI(self):
         # Setup recording animation
-        self.loadingAnimation = QMovie('assets/homeView.gif')
+        self.loadingAnimation = QMovie('assets/loadingView.gif')
         self.loadingScreen = QLabel(self.parent())
         self.loadingScreen.resize(1080, 1080)
         self.loadingScreen.setMovie(self.loadingAnimation)
