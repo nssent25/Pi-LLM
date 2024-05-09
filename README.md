@@ -15,8 +15,9 @@ This is the code for a Raspberry Pi-based personal assistant. It uses open sourc
 - [x] Recorder: ```audio.py```
 - [x] Client server interaction: ```client.py```
 - [x] GUI: ```main_new.py```
-- [ ] NFC emulation: ```nfctest.py```
+- [ ] NFC emulation: ```nfctest.py, cli.py, beam.py```
 
 ## What needs work:
 - [ ] Recognize and classify prompt accurately (classifier.txt, chat_model.py)
 - [ ] Text-to-speech 
+- [ ] NFC emulation pulls up Apple Pay instead of URL
