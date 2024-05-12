@@ -3,13 +3,21 @@
 ## Introduction
 This is the code for a Raspberry Pi-based personal assistant. It uses open source libraries to perform tasks such as voice recognition, translation, image generation, and conversation. 
 
+## Server:
+- [x] Flask server: ```server_main.py```
+- [x] Chat model and classifier: ```chat_model.py```
+- [x] Image generation: ```image_gen.py```
+- [x] Translation: ```translator.py```
+- [x] Transcription: ```whisper_speech.py```
+- [ ] Text-to-speech: ```speech_transcribe.py```
+
+## Client:
+- [x] Recorder: ```audio.py```
+- [x] Client server interaction: ```client.py```
+- [x] GUI: ```main_new.py```
+- [ ] NFC emulation: ```nfctest.py, cli.py, beam.py```
+
 ## What needs work:
-- [*] GUI (Recorder)
-- [x] Record audio
-- [x] Recognize words, translate if necessary (whisper_speech.py)
-- [*] Recognize and classify prompt (classifier.txt, chat_model.py)
-- [ ] Image generation (image_gen.py)
-- [*] Translation (translator.py)
-- [x] Chat model (chat_model.py)
-- [x] Translate chat model if necessary
+- [ ] Recognize and classify prompt accurately (classifier.txt, chat_model.py)
 - [ ] Text-to-speech 
+- [ ] NFC emulation pulls up Apple Pay instead of URL
