@@ -2,8 +2,8 @@ PWD /Users/nithun.s/Documents/College/Courses/CS431/Pi-LLM/Report
 INPUT /usr/local/texlive/2022/texmf.cnf
 INPUT /usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2022/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/nithun.s/Documents/College/Courses/CS431/Pi-LLM/Report/test.tex
-OUTPUT test.log
+INPUT /Users/nithun.s/Documents/College/Courses/CS431/Pi-LLM/Report/report.tex
+OUTPUT report.log
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/base/article.cls
@@ -497,10 +497,10 @@ INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.de
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-INPUT ./test.aux
-INPUT test.aux
-INPUT test.aux
-OUTPUT test.aux
+INPUT ./report.aux
+INPUT report.aux
+INPUT report.aux
+OUTPUT report.aux
 INPUT /usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -520,18 +520,18 @@ INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
-INPUT ./test.out
-INPUT test.out
-INPUT ./test.out
-INPUT test.out
-INPUT ./test.out
-INPUT test.out
-INPUT ./test.out
-INPUT test.out
-OUTPUT test.pdf
-INPUT ./test.out
-INPUT ./test.out
-OUTPUT test.out
+INPUT ./report.out
+INPUT report.out
+INPUT ./report.out
+INPUT report.out
+INPUT ./report.out
+INPUT report.out
+INPUT ./report.out
+INPUT report.out
+OUTPUT report.pdf
+INPUT ./report.out
+INPUT ./report.out
+OUTPUT report.out
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmr17.tfm
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmr12.tfm
@@ -588,19 +588,59 @@ INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmex10.tfm
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
-INPUT ./linear dependency.png
-INPUT ./linear dependency.png
-INPUT linear dependency.png
-INPUT ./linear dependency.png
-INPUT ./linear dependency.png
 INPUT ./majors.png
 INPUT ./majors.png
 INPUT majors.png
 INPUT ./majors.png
 INPUT ./majors.png
-INPUT test.aux
-INPUT ./test.out
-INPUT ./test.out
+INPUT ./previousengagement.png
+INPUT ./previousengagement.png
+INPUT previousengagement.png
+INPUT ./previousengagement.png
+INPUT ./previousengagement.png
+INPUT ./familarity.png
+INPUT ./familarity.png
+INPUT familarity.png
+INPUT ./familarity.png
+INPUT ./familarity.png
+INPUT ./educational influence.png
+INPUT ./educational influence.png
+INPUT educational influence.png
+INPUT ./educational influence.png
+INPUT ./educational influence.png
+INPUT ./daily influence.png
+INPUT ./daily influence.png
+INPUT daily influence.png
+INPUT ./daily influence.png
+INPUT ./daily influence.png
+INPUT ./opinion.png
+INPUT ./opinion.png
+INPUT opinion.png
+INPUT ./opinion.png
+INPUT ./opinion.png
+INPUT ./emotion.png
+INPUT ./emotion.png
+INPUT emotion.png
+INPUT ./emotion.png
+INPUT ./emotion.png
+INPUT ./Primary concern regarding AI.png
+INPUT ./Primary concern regarding AI.png
+INPUT Primary concern regarding AI.png
+INPUT ./Primary concern regarding AI.png
+INPUT ./Primary concern regarding AI.png
+INPUT ./importance of privacy.png
+INPUT ./importance of privacy.png
+INPUT importance of privacy.png
+INPUT ./importance of privacy.png
+INPUT ./importance of privacy.png
+INPUT ./linear dependency.png
+INPUT ./linear dependency.png
+INPUT linear dependency.png
+INPUT ./linear dependency.png
+INPUT ./linear dependency.png
+INPUT report.aux
+INPUT ./report.out
+INPUT ./report.out
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT /usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb

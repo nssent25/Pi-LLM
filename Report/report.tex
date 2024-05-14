@@ -150,50 +150,52 @@ The server employs stringent security measures including:
 \subsection{Testing, Validation, and Refinement}
 The assistant undergoes rigorous testing and validation across various scenarios to verify its performance on privacy, usability, accuracy, and user satisfaction. This includes stress testing the device under various environmental conditions and user testing to gather feedback on the interface's intuitiveness and responsiveness. Based on user feedback and performance data, we continuously refine our system throughout development to better meet user needs and ensure that the hardware and software components function correctly in real-world scenarios. 
 
-\section{Results}
-\subsection{User Reflection}
-We conducted a user reflection survey to gather feedback on the assistant's performance. Inspired by the methodological framework in "Evaluation of Emotional Satisfaction Using Questionnaires in Voice-Based Human–AI Interaction," we broke down the survey into different factors that may affect user satisfaction. The survey was designed to evaluate aspects such as user satisfaction, privacy concerns, and suggestions for future improvements. We analyzed the correlation between various user satisfaction metrics and the assistant's performance with overall satisfaction to identify the most crucial factors affecting user satisfaction and pinpoint areas for improvement.
+
+\section{User Reflection}
+\subsection{User Profile}
+Admittedly, the data source exhibits a potential bias due to the context in which the tests were conducted, primarily during classroom sessions and computer science CLAS. Consequently, a majority of the participants are STEM majors, who typically exhibit more positive emotional connection as stated in Figure~\ref{emotion} and a higher familiarity and more favorable disposition towards AI tools, as illustrated in Figure~\ref{familiarity}. Despite this skew in participant demographics, it is unequivocally evident that privacy remains a significant concern among users, as demonstrated in Figure~\ref{concerns}. This reflection also underscores the critical importance of adopting specific methods of human-robot interaction to enhance user satisfaction with AI tools.
+
+\subsection{User Satisfaction}
+Informed by the methodological framework described in Shin et al.\cite{shin2021emotional}, this section meticulously analyzes various factors contributing to user satisfaction. Each factor was assessed using a five-point scale ranging from negative to positive feelings. Our goal was to dissect these responses to uncover any correlations between individual satisfaction metrics and the overall effectiveness of the assistant as perceived by users (Figure~\ref{dotplot}).
 
 \begin{figure}[bht]
-	\begin{center}
-	{\resizebox{4.5in}{!}{\includegraphics{dotplot.png}}}
-	%        {x-dim}{y-dim}
-	% ! means proportional scaling
-	\end{center}
-	\vspace{-5mm} % just to remove the extra space between the figure and the caption
-    \caption{Dot Plot with Linear Tendency of User Satisfaction factors}
-	\label{dotplot}
+\centering
+{\resizebox{4.5in}{!}{\includegraphics{dotplot.png}}}
+\vspace{-5mm}
+\caption{Dot Plot with Linear Tendency of User Satisfaction Factors}
+\label{dotplot}
+\end{figure}
+The survey revealed that the depth and comprehensiveness of information provided by the system were highly valued, showing a strong positive correlation with overall user satisfaction. Efficiency metrics, including the speed of the assistant’s responses and the accuracy of speech recognition, were also critically important, suggesting that users place a high premium on quick and accurate interactions. Conversely, the need for users to repeat questions due to misunderstanding or errors negatively impacted satisfaction, highlighting a crucial area for technological refinement.
+
+\begin{figure}[bht]
+\centering
+{\resizebox{4.5in}{!}{\includegraphics{factorchart.png}}}
+\vspace{-5mm}
+\caption{Correlation Parameters of User Satisfaction Factors}
+\label{factorchart}
 \end{figure}
 
-The depth of information in the responses provided by the system had the highest positive correlation with overall user satisfaction, suggesting that users value comprehensive and detailed answers. Efficiency metrics such as the accuracy of speech recognition and the time it took for the assistant to respond were also significantly correlated with satisfaction, indicating the importance of a responsive and accurate system.
-The need to repeat questions negatively affected user satisfaction, highlighting an area for immediate improvement.\\
-
-% Figure 1: Dot Plot with Linear Tendency Line for Depth of Information and User Satisfaction.
-% Figure 2: Correlation Bar Graph of User Satisfaction Metrics.
-% Figure 3: Composite Graph of All Factors with Linear Regression Analysis.
-
-
-\begin{figure}[bht]
-	\begin{center}
-	{\resizebox{4.5in}{!}{\includegraphics{factorchart.png}}}
-	%        {x-dim}{y-dim}
-	% ! means proportional scaling
-	\end{center}
-	\vspace{-5mm} % just to remove the extra space between the figure and the caption
-\caption{User Satisfaction factors correlation parameters}
-	\label{factorchart}
-	\end{figure}
- 
-With the correlation calculation \eqref{correlation}, we numerically calculate the correlation parameter of each factors. The correlation analysis of user satisfaction metrics underscores the importance of the structure of a response, with a significant correlation, highlighting that users value clear and logical answers the most. Speech recognition accuracy and response time also affect satisfaction, indicating that effective communication and speed are key to a positive user experience. Other features like image generation, though beneficial, are less critical to overall satisfaction.
+Detailed in Figure~\ref{factorchart}, our correlation analysis further emphasizes the importance of response structure, indicating that users greatly appreciate clear, logical, and well-structured answers. While technical features like speech recognition and quick response times are fundamental, additional functionalities such as image generation, though advantageous, were identified as secondary in influencing overall satisfaction.
 
 \subsection{Future Development}
-User Experience Enhancements: Users appreciated the quick responsiveness and user-friendly interface of the assistant. Potential enhancements could include reducing distractions from background noise and updating the database more frequently to ensure the information remains current.
+Analyzing the responses provided by users, we have identified several areas for potential enhancements and innovations:
+\begin{itemize}
+	\item \textbf{User Experience Enhancements:} Users expressed a need for a more distraction-free environment, as the microphone occasionally picked up background conversations in a busy conference room, suggesting improvements to minimize background noise interference and more frequent updates to the database to maintain the currency and relevance of the information provided. We are looking into implementing an audio preprocessing module to filter out background noise and improve the assistant's ability to focus on the user's voice and improve transcription accuracy. Users also mentioned adding a button to quickly talk to the assistant, rather than having to go back to the home screen to record a new prompt.
+	
+	\item \textbf{Feature Additions:} Participants also recommended more robust capabilities for handling translation queries. Moreover, there were specific calls for advancing the assistant's image generation features, particularly in addressing and navigating complex copyright issues.
+	
+ 	\item \textbf{Privacy and Trust:} The feedback underscored a significant concern for privacy and data security. Users indicated a strong desire for more transparent and explicit communication regarding how their data is managed and protected. This feedback suggests that enhancing privacy features and trust assurances could significantly improve user confidence and satisfaction with the assistant. 
+ 	
+	\item \textbf{Newer Models and Functionalities:} Participants expressed interest in features like text-to-speech capabilities so they can listen to responses, which would help significantly with translation tasks. We are also looking to explore recent developments in open-source AI models, like the newly released Llama3, which could potentially enhance the assistant's capabilities with chat interactions and classification.
+\end{itemize}
+These detailed insights and user feedback are invaluable as we strategize for future development, aiming to not only enhance user satisfaction but also to expand and refine the capabilities of our AI assistant. This continuous feedback loop will ensure that the assistant evolves in alignment with user needs and expectations, ultimately leading to a more effective and user-centric tool.
 
-Feature Additions: Several suggestions for new features were mentioned, such as improved handling of multilingual interactions, more basic informational queries, and enhancements in image generation capabilities, especially concerning copyright issues. Future improvements could include fine-tuning the models, particularly the classifier, as we are currently relying on pre-trained models.
+\section{Conclusion}
+In this research, we have addressed the growing concerns surrounding privacy and ethical considerations in AI-driven personal digital assistants by developing a Raspberry Pi-based AI assistant that leverages on-device machine learning. Our project demonstrates that it is possible to create a multifunctional, privacy-centric AI assistant that operates efficiently within a compact hardware setup, ensuring user data remains secure and locally processed.
+We have implemented a robust and modular system architecture that integrates advanced hardware components with state-of-the-art AI models for transcription, classification, and task-specific processing. This design not only prioritizes user privacy but also maintains high performance and accuracy, catering to various user needs such as real-time translation, multilingual interaction, and personalized image generation.
+We have identified key areas for future development, including enhancements in user experience, feature additions, and further strengthening of privacy and trust mechanisms.
 
-Privacy and Trust: Given the strong focus on privacy, it might be beneficial to include more explicit information or features that reassure users about how their data is being handled and protected. This could help in building trust and ensuring a more secure user experience.
-
-These findings and user feedback will guide our development strategy as we aim to enhance user satisfaction and broaden the capabilities of our AI assistant.
+As we look forward, it is clear that developments in open-source AI models and on-device machine learning will continue to shape the future of AI assistants, where running local models on edge devices will become increasingly common. Our project serves as a stepping stone towards this future, setting a precedent for privacy-focused design and user-centric AI technologies that prioritize user satisfaction and data security.
 
 
 \section*{Acknowledgements}
@@ -227,27 +229,7 @@ NLLB Team et al. (2022). ``\emph{No Language Left Behind: Scaling Human-Centered
 \end{thebibliography}
 
 \newpage 
-\section*{Appendix}
-
-
-  \begin{equation}\label{correlation}
-   Correlation = \frac{n(\sum Factor\times Satisf) - (\sum Factor)(\sum Satisf)}{\sqrt{[n\sum Factor^2 - (\sum Factor)^2][n\sum Satisf^2 - (\sum Satisf)^2]}}
-  \end{equation}
-
-
-
-
-\begin{figure}[bht]
-	\begin{center}
-	{\resizebox{4.5in}{!}{\includegraphics{linear dependency.png}}}
-	%        {x-dim}{y-dim}
-	% ! means proportional scaling
-	\end{center}
-	\vspace{-5mm} % just to remove the extra space between the figure and the caption
-\caption{Linear Tendency of User Satisfaction factors}
-	\label{linear tendency}
-	\end{figure}
-
+\section*{A Appendix}
 
 \begin{figure}[bht]
 	\begin{center}
@@ -256,17 +238,111 @@ NLLB Team et al. (2022). ``\emph{No Language Left Behind: Scaling Human-Centered
 	% ! means proportional scaling
 	\end{center}
 	\vspace{-5mm} % just to remove the extra space between the figure and the caption
-\caption{Majors}
-	\label{majors}
+\caption{Major Distribution Among Participants}
+\label{majors}
 	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4in}{!}{\includegraphics{previousengagement.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Participants' Prior Engagement with AI Tools}
+	\label{previous engaement}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{familarity.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center} 
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Participants' Familiarity with AI Tools}
+	\label{familiarity}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{educational influence.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Influence of AI on Participants' Education}
+	\label{educaiton}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{daily influence.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Influence of AI on Participants' Daily Life}
+	\label{Dailylife}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{opinion.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Participants' Overall Opinion on AI}
+	\label{opinion}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{emotion.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling 
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Emotion Most Commonly Associated with AI by Participants}
+	\label{emotion}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{Primary concern regarding AI.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Participants' Primary Concerns Regarding AI}
+	\label{concerns}
+	\end{figure}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{importance of privacy.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Participants' Views on the Importance of Privacy and Data Security in AI}
+	\label{privacy and data security}
+	\end{figure}
+ 
+  \begin{equation}\label{correlation}
+   Correlation = \frac{n(\sum Factor\times Satisf) - (\sum Factor)(\sum Satisf)}{\sqrt{[n\sum Factor^2 - (\sum Factor)^2][n\sum Satisf^2 - (\sum Satisf)^2]}}
+  \end{equation}
 
+\begin{figure}[bht]
+	\begin{center}
+	{\resizebox{4.5in}{!}{\includegraphics{linear dependency.png}}}
+	%        {x-dim}{y-dim}
+	% ! means proportional scaling
+	\end{center}
+	\vspace{-5mm} % just to remove the extra space between the figure and the caption
+\caption{Linear Dependency of User Satisfaction Factors}
+	\label{linear tendency}
+	\end{figure}
 
 \end{document}
