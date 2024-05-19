@@ -1,7 +1,7 @@
-# Pi-LLM
+# CS431 Pi-LLM
 
 ## Introduction
-This is the code for a Raspberry Pi-based personal assistant. It uses open source libraries to perform tasks such as voice recognition, translation, image generation, and conversation. **This project is mostly an excuse to mess with open source models.**
+This is the code for a Raspberry Pi-based personal assistant. It uses open source libraries to perform tasks such as voice recognition, translation, image generation, and conversation. **This project is an excuse to mess with open source models and test them.** The project report is under ```Report/report.pdf```
 
 ## Server:
 - [x] Flask server: ```server_main.py```
