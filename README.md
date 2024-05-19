@@ -1,7 +1,7 @@
 # Pi-LLM
 
 ## Introduction
-This is the code for a Raspberry Pi-based personal assistant. It uses open source libraries to perform tasks such as voice recognition, translation, image generation, and conversation. 
+This is the code for a Raspberry Pi-based personal assistant. It uses open source libraries to perform tasks such as voice recognition, translation, image generation, and conversation. **This project is mostly an excuse to mess with open source models.**
 
 ## Server:
 - [x] Flask server: ```server_main.py```
@@ -13,11 +13,11 @@ This is the code for a Raspberry Pi-based personal assistant. It uses open sourc
 
 ## Client:
 - [x] Recorder: ```audio.py```
-- [x] Client server interaction: ```client.py```
+- [x] Client-server interaction: ```client.py```
 - [x] GUI: ```main_new.py```
 - [ ] NFC emulation: ```nfctest.py, cli.py, beam.py```
 
 ## What needs work:
-- [ ] Recognize and classify prompt accurately (classifier.txt, chat_model.py)
-- [ ] Text-to-speech 
-- [ ] NFC emulation pulls up Apple Pay instead of URL
+- [ ] Recognize and classify prompt accurately (classifier.txt, chat_model.py, fails hilariously sometimes, try Llama3?)
+- [ ] Text-to-speech (Meta MBART?)
+- [ ] NFC emulation pulls up Apple Pay instead of URL (PN532 issues)
